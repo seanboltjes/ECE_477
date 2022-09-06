@@ -1,11 +1,9 @@
 #include <Arduino.h>
 #include "IMU_9DOF_BNO08x.h"
 #include "IMU_9DOF_9250.h"
-#include "IMU_3DOF_MAGNETOMETER.h"
 
 IMU_9DOF_BNO08x bno;
 IMU_9DOF_9250 mpu;
-// IMU_3DOF_MAGNETOMETER compass;
 
 uint16_t count;
 uint32_t startTime;
@@ -26,10 +24,9 @@ void setup()
 
     bno.Init();
     mpu.Init();
-    // compass.Init();
 }
 
-void loop()
+void loop2()
 {
     startTime = millis();
     count = 0;
@@ -79,7 +76,7 @@ void loop()
 
 
 
-void loop2()
+void loop()
 {
     startTime = millis();
     count = 0;
