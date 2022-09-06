@@ -41,7 +41,7 @@ public:
     void GetAndPrintAllReadings();
 
     void CorrectAccel(DirectionalValues& accel);
-    void UpdatePosition(DirectionalValues& correctedAccel, uint32_t timeSinceLastUpdate_us);
+    void UpdatePosition(DirectionalValues& correctedAccel, uint32_t timeSinceLastUpdate_us, bool& newMeasureReady);
 
 
 
@@ -65,15 +65,6 @@ protected:
 private:
     uint32_t microsSinceLastTimeValuesUpdated;
     float deltat = 0.0f;
-    
-    float r0 = 0;
-    float r1 = 0;
-    float i0 = 0;
-    float i1 = 0;
-    float j0 = 0;
-    float j1 = 0;
-    float k0 = 0;
-    float k1 = 0;
 
     float gravX;
     float gravY;
@@ -85,6 +76,14 @@ private:
     float velX = 0;
     float velY = 0;
     float velZ = 0;
+
+    uint16_t numZeroX = 0;
+    uint16_t numZeroY = 0;
+    uint16_t numZeroZ = 0;
+
+    float posXCache = 0;
+    float posYCache = 0;
+    float posZCache = 0;
 
 
 

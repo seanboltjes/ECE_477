@@ -66,29 +66,56 @@ bool IMU_9DOF::GetGravityVector(DirectionalValues& gravityVector, DirectionalVal
 
 void IMU_9DOF::CorrectAccel(DirectionalValues& accel)
 {
-    // GetAccelVals(accel);
-
     accel.x -= gravX;
     accel.y -= gravY;
     accel.z -= gravZ;
 }
 
 
-void IMU_9DOF::UpdatePosition(DirectionalValues& correctedAccel, uint32_t timeSinceLastUpdate_us)
+void IMU_9DOF::UpdatePosition(DirectionalValues& correctedAccel, uint32_t timeSinceLastUpdate_us, bool& newMeasureReady)
 {
     double accelTermX, accelTermY, accelTermZ;
 
-    if (correctedAccel.x < 0.05 && correctedAccel.x > -0.05)
+    if (correctedAccel.x < 0.03 && correctedAccel.x > -0.03)
     {
-        correctedAccel.x = 0;
+        correctedAccel.x = 0.0f;
+        numZeroX++;
     }
-    if (correctedAccel.y < 0.05 && correctedAccel.y > -0.05)
+    if (correctedAccel.y < 0.03 && correctedAccel.y > -0.03)
     {
-        correctedAccel.y = 0;
+        correctedAccel.y = 0.0f;
+        numZeroY++;
     }
-    if (correctedAccel.z < 0.05 && correctedAccel.z > -0.05)
+    if (correctedAccel.z < 0.03 && correctedAccel.z > -0.03)
     {
-        correctedAccel.z = 0;
+        correctedAccel.z = 0.0f;
+        numZeroZ++;
+    }
+    
+
+    if (numZeroX >= 3)
+    {
+        posXCache = posX;
+        numZeroX = 0;
+        velX = 0.0f;
+        posX = 0.0f;
+        newMeasureReady = true;
+    }
+    if (numZeroY >= 3)
+    {
+        posYCache = posY;
+        numZeroY = 0;
+        velY = 0.0f;
+        posY = 0.0f;
+        newMeasureReady = true;
+    }
+    if (numZeroZ >= 3)
+    {
+        posZCache = posZ;
+        numZeroZ = 0;
+        velZ = 0.0f;
+        posZ = 0.0f;
+        newMeasureReady = true;
     }
 
     double timeSinceLastUpdate_us_squared = pow(timeSinceLastUpdate_us, 2);
@@ -152,9 +179,6 @@ bool IMU_9DOF::GetQuaternion(Quaternion& quaternion, DirectionalValues accel, Di
     quaternion.i = x;
     quaternion.j = y;
     quaternion.k = z;
-
-    // ComputeQuaternion(quaternion, accel, gyro, magnet);
-
 
     return true;
 }
@@ -259,42 +283,10 @@ void IMU_9DOF::ComputeQuaternion(Quaternion& quaternion, DirectionalValues& acce
     norm = sqrtf(q1 * q1 + q2 * q2 + q3 * q3 + q4 * q4);    // normalise quaternion
     norm = 1.0f/norm;
 
-    // quaternion.real = (q1 * norm + r0) / 2;
-    // quaternion.i    = (q2 * norm + i0) / 2;
-    // quaternion.j    = (q3 * norm + j0) / 2;
-    // quaternion.k    = (q4 * norm + k0) / 2;
-
-    // r0 = quaternion.real;
-
-    // i0 = quaternion.i;
-
-    // j0 = quaternion.j;
-    
-    // k0 = quaternion.k;
-
-
-    quaternion.real = (q1 * norm + r0 + r1) / 3;
-    quaternion.i    = (q2 * norm + i0 + i1) / 3;
-    quaternion.j    = (q3 * norm + j0 + j1) / 3;
-    quaternion.k    = (q4 * norm + k0 + k1) / 3;
-
-    r1 = r0;
-    r0 = quaternion.real;
-
-    i1 = i0;
-    i0 = quaternion.i;
-
-    j1 = j0;
-    j0 = quaternion.j;
-    
-    k1 = k0;
-    k0 = quaternion.k;
-
-
-    // quaternion.real = q1 * norm;
-    // quaternion.i    = q2 * norm;
-    // quaternion.j    = q3 * norm;
-    // quaternion.k    = q4 * norm;
+    quaternion.real = q1 * norm;
+    quaternion.i    = q2 * norm;
+    quaternion.j    = q3 * norm;
+    quaternion.k    = q4 * norm;
 }
 
 
@@ -371,13 +363,13 @@ void IMU_9DOF::PrintEulerRotations(Euler& eulerRotations)
 
 void IMU_9DOF::PrintCurrentPosition(DirectionalValues& accel)
 {
-    Serial.print("(");
-    Serial.print(posX);
+    Serial.print("Position(m) (x, y, z):  (");
+    Serial.print(posXCache);
     Serial.print(", ");
-    Serial.print(posY);
+    Serial.print(posYCache);
     Serial.print(", ");
-    Serial.print(posZ);
-    Serial.print(")   ");
+    Serial.print(posZCache);
+    Serial.print(")   Corrected Accel(m/s/s) (x, y, z):  ");
 
     Serial.print(accel.x);
     Serial.print(", ");

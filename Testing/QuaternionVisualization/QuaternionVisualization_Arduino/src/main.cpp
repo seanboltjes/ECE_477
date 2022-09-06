@@ -62,10 +62,12 @@ void loop()
             // IMU_6DOF::PrintReadingsAccel(accel);
 
             lastUpdate = micros();
+            bool isNewPositionReady = false;
 
-            bno.UpdatePosition(accel, lastUpdate - measureBeginTime);
+            bno.UpdatePosition(accel, lastUpdate - measureBeginTime, isNewPositionReady);
             
-            bno.PrintCurrentPosition(accel);
+            if (isNewPositionReady)
+                bno.PrintCurrentPosition(accel);
         }
 
         count++;
