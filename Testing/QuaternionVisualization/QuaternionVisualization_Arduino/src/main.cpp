@@ -26,7 +26,7 @@ void setup()
     mpu.Init();
 }
 
-void loop2()
+void loop()
 {
     startTime = millis();
     count = 0;
@@ -63,8 +63,8 @@ void loop2()
 
             bno.UpdatePosition(accel, lastUpdate - measureBeginTime, isNewPositionReady);
             
-            if (isNewPositionReady)
-                bno.PrintCurrentPosition(accel);
+            // if (isNewPositionReady)
+            bno.PrintCurrentPosition(accel);
         }
 
         count++;
@@ -76,7 +76,7 @@ void loop2()
 
 
 
-void loop()
+void loop2()
 {
     startTime = millis();
     count = 0;

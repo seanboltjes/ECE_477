@@ -4,7 +4,7 @@
 IMU_9DOF::IMU_9DOF()
 {
     filter = new Adafruit_Mahony();
-    filter->begin(101);    // 48  50  29
+    filter->begin(101.0);    // 48  50  29
 }
 
 bool IMU_9DOF::GetQuaternion(Quaternion& quaternion)
@@ -75,52 +75,69 @@ void IMU_9DOF::CorrectAccel(DirectionalValues& accel)
 void IMU_9DOF::UpdatePosition(DirectionalValues& correctedAccel, uint32_t timeSinceLastUpdate_us, bool& newMeasureReady)
 {
     double accelTermX, accelTermY, accelTermZ;
+    // Serial.println(timeSinceLastUpdate_us);
 
-    if (correctedAccel.x < 0.03 && correctedAccel.x > -0.03)
+    const double errorMargin = 0.03;
+    const double neg_errorMargin = -0.03;
+
+    const double errorMarginVel = 0.001;
+    const double neg_errorMarginVel = -0.001;
+
+    if (correctedAccel.x < errorMargin && correctedAccel.x > neg_errorMargin)
     {
         correctedAccel.x = 0.0f;
         numZeroX++;
     }
-    if (correctedAccel.y < 0.03 && correctedAccel.y > -0.03)
+    if (correctedAccel.y < errorMargin && correctedAccel.y > neg_errorMargin)
     {
         correctedAccel.y = 0.0f;
         numZeroY++;
     }
-    if (correctedAccel.z < 0.03 && correctedAccel.z > -0.03)
+    if (correctedAccel.z < errorMargin && correctedAccel.z > neg_errorMargin)
     {
         correctedAccel.z = 0.0f;
         numZeroZ++;
+    }
+
+
+    if (velX < errorMarginVel && velX > neg_errorMarginVel) 
+    {
+        velX = 0.0f;
+    }
+    if (velY < errorMarginVel && velY > neg_errorMarginVel) 
+    {
+        velY = 0.0f;
+    }
+    if (velZ < errorMarginVel && velZ > neg_errorMarginVel) 
+    {
+        velZ = 0.0f;
     }
     
 
     if (numZeroX >= 3)
     {
-        posXCache = posX;
         numZeroX = 0;
         velX = 0.0f;
-        posX = 0.0f;
-        newMeasureReady = true;
+        // posX = 0.0f;
+        // newMeasureReady = true;
     }
     if (numZeroY >= 3)
     {
-        posYCache = posY;
         numZeroY = 0;
         velY = 0.0f;
-        posY = 0.0f;
-        newMeasureReady = true;
+        // posY = 0.0f;
+        // newMeasureReady = true;
     }
     if (numZeroZ >= 3)
     {
-        posZCache = posZ;
         numZeroZ = 0;
         velZ = 0.0f;
-        posZ = 0.0f;
-        newMeasureReady = true;
+        // posZ = 0.0f;
+        // newMeasureReady = true;
     }
 
-    double timeSinceLastUpdate_us_squared = pow(timeSinceLastUpdate_us, 2);
     double timeSinceLastUpdate_sec = timeSinceLastUpdate_us * 0.000001;
-    double timeSinceLastUpdate_sec_squared = timeSinceLastUpdate_us_squared * 0.000001;
+    double timeSinceLastUpdate_sec_squared = pow(timeSinceLastUpdate_sec, 2);
     double accelTermCoeff = timeSinceLastUpdate_sec_squared * 0.5;
 
     velX += timeSinceLastUpdate_sec * correctedAccel.x;
@@ -363,14 +380,22 @@ void IMU_9DOF::PrintEulerRotations(Euler& eulerRotations)
 
 void IMU_9DOF::PrintCurrentPosition(DirectionalValues& accel)
 {
-    Serial.print("Position(m) (x, y, z):  (");
-    Serial.print(posXCache);
+    Serial.print("Position(m) (x, y, z): (");
+    Serial.print(posX);
     Serial.print(", ");
-    Serial.print(posYCache);
+    Serial.print(posY);
     Serial.print(", ");
-    Serial.print(posZCache);
-    Serial.print(")   Corrected Accel(m/s/s) (x, y, z):  ");
+    Serial.print(posZ);
+    Serial.print(")");
 
+    Serial.print(" Velocity(m/s): (");
+    Serial.print(velX);
+    Serial.print(", ");
+    Serial.print(velY);
+    Serial.print(", ");
+    Serial.print(velZ);
+
+    Serial.print(")  Accel(m/s/s) (x, y, z): ");
     Serial.print(accel.x);
     Serial.print(", ");
     Serial.print(accel.y);
