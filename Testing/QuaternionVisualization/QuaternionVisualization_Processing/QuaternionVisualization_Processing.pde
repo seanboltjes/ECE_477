@@ -10,7 +10,7 @@ float roll, pitch, yaw;
 
 void setup() {
   size (1800, 1200, P3D);
-  myPort = new Serial(this, "COM6", 19200); // starts the serial communication
+  myPort = new Serial(this, "COM6", 9600); // starts the serial communication
   myPort.bufferUntil('\n');
   
   r = 1.0;
@@ -55,6 +55,7 @@ void serialEvent (Serial myPort) {
     data = trim(data);
     
     // split the string at "/"
+    println(data);
     String items[] = split(data, "/");
     if (items.length > 1) {
       //--- Quaternion values
@@ -62,6 +63,10 @@ void serialEvent (Serial myPort) {
       i = float(items[1]);
       j = float(items[2]);
       k = float(items[3]);
+      //roll  = float(items[0]);
+      //pitch = float(items[1]);
+      //yaw   = float(items[2]);
+
     }
   }
 }

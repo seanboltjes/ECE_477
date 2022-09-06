@@ -7,7 +7,6 @@
  */
 void IMU_9DOF_BNO08x::Init()
 {
-    Wire.setClock(100000);
     Wire.begin();
     imu = new Adafruit_BNO08x();
 
@@ -46,14 +45,14 @@ bool IMU_9DOF_BNO08x::SetReports()
 {
     bool allSucces = true;
 
-    // if (!imu->enableReport(SH2_ACCELEROMETER)) {
-    //     Serial.println("Could not enable accelerometer");
-    //     allSucces = false;
-    // }
-    // if (!imu->enableReport(SH2_GYROSCOPE_CALIBRATED)) {
-    //     Serial.println("Could not enable gyroscope");
-    //     allSucces = false;
-    // }
+    if (!imu->enableReport(SH2_ACCELEROMETER)) {
+        Serial.println("Could not enable accelerometer");
+        allSucces = false;
+    }
+    if (!imu->enableReport(SH2_GYROSCOPE_CALIBRATED)) {
+        Serial.println("Could not enable gyroscope");
+        allSucces = false;
+    }
     if (!imu->enableReport(SH2_MAGNETIC_FIELD_CALIBRATED)) {
         Serial.println("Could not enable magnetic field calibrated");
         allSucces = false;
@@ -113,8 +112,8 @@ bool IMU_9DOF_BNO08x::GetMagnetometerVals(DirectionalValues& magn)
         {
             if (sensorValue.sensorId == SH2_MAGNETIC_FIELD_CALIBRATED)
             {
-                magn.y = -1 * (sensorValue.un.magneticField.x);
-                magn.x = sensorValue.un.magneticField.y;
+                magn.x = sensorValue.un.magneticField.x;
+                magn.y = sensorValue.un.magneticField.y;
                 magn.z = sensorValue.un.magneticField.z;
 
                 return true;

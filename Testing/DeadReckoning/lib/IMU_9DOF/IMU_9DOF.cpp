@@ -3,8 +3,8 @@
 
 IMU_9DOF::IMU_9DOF()
 {
-    filter = new Adafruit_Mahony();
-    filter->begin(101);    // 48  50  29
+    filter = new Adafruit_Madgwick();
+    filter->begin(48);    // 48  50  29
 }
 
 bool IMU_9DOF::GetQuaternion(Quaternion& quaternion)
@@ -37,123 +37,24 @@ bool IMU_9DOF::GetQuaternion(Quaternion& quaternion)
     return true;
 }
 
-bool IMU_9DOF::GetGravityVector(DirectionalValues& gravityVector, DirectionalValues accel, DirectionalValues gyro, DirectionalValues magnet)
-{
-    // float x, y, z;
-
-    // filter->getGravityVector(&x, &y, &z);
-
-    // gravityVector.x = x;
-    // gravityVector.y = y;
-    // gravityVector.z = z;
-
-
-    
-    Euler eulerRotation;
-    GetEulerRotation(eulerRotation, accel, gyro, magnet);
-
-    gravityVector.z = cos(UnitConversions::DegreesToRadians(eulerRotation.roll)) * cos(UnitConversions::DegreesToRadians(eulerRotation.pitch));
-    gravityVector.y = sin(UnitConversions::DegreesToRadians(eulerRotation.roll)) * cos(UnitConversions::DegreesToRadians(eulerRotation.pitch));
-    gravityVector.x = -1 * sin(UnitConversions::DegreesToRadians(eulerRotation.pitch));
-
-    
-    gravX = gravityVector.x;
-    gravY = gravityVector.y;
-    gravZ = gravityVector.z;
-
-    return true;
-}
-
-void IMU_9DOF::CorrectAccel(DirectionalValues& accel)
-{
-    // GetAccelVals(accel);
-
-    accel.x -= gravX;
-    accel.y -= gravY;
-    accel.z -= gravZ;
-}
-
-
-void IMU_9DOF::UpdatePosition(DirectionalValues& correctedAccel, uint32_t timeSinceLastUpdate_us)
-{
-    double accelTermX, accelTermY, accelTermZ;
-
-    if (correctedAccel.x < 0.05 && correctedAccel.x > -0.05)
-    {
-        correctedAccel.x = 0;
-    }
-    if (correctedAccel.y < 0.05 && correctedAccel.y > -0.05)
-    {
-        correctedAccel.y = 0;
-    }
-    if (correctedAccel.z < 0.05 && correctedAccel.z > -0.05)
-    {
-        correctedAccel.z = 0;
-    }
-
-    double timeSinceLastUpdate_us_squared = pow(timeSinceLastUpdate_us, 2);
-    double timeSinceLastUpdate_sec = timeSinceLastUpdate_us * 0.000001;
-    double timeSinceLastUpdate_sec_squared = timeSinceLastUpdate_us_squared * 0.000001;
-    double accelTermCoeff = timeSinceLastUpdate_sec_squared * 0.5;
-
-    velX += timeSinceLastUpdate_sec * correctedAccel.x;
-    velY += timeSinceLastUpdate_sec * correctedAccel.y;
-    velZ += timeSinceLastUpdate_sec * correctedAccel.z;
-
-    accelTermX = correctedAccel.x * accelTermCoeff;
-    accelTermY = correctedAccel.y * accelTermCoeff;
-    accelTermZ = correctedAccel.z * accelTermCoeff;
-
-    posX += (velX * timeSinceLastUpdate_sec + accelTermX);
-    posY += (velY * timeSinceLastUpdate_sec + accelTermY);
-    posZ += (velZ * timeSinceLastUpdate_sec + accelTermZ);
-}
-
-
-bool IMU_9DOF::GetEulerRotation(Euler& eulerRotations, DirectionalValues accel, DirectionalValues gyro, DirectionalValues magnet)
-{
-    Quaternion quaternion;
-    if (GetQuaternion(quaternion, accel, gyro, magnet))
-    {
-        float t0 = 2.0 * (quaternion.real * quaternion.i + quaternion.j * quaternion.k);
-        float t1 = 1.0 - 2.0 * (quaternion.i * quaternion.i + quaternion.j * quaternion.j);
-        eulerRotations.roll = UnitConversions::RadiansToDegrees(atan2(t0, t1));
-
-        float t2 = +2.0 * (quaternion.real * quaternion.j - quaternion.k * quaternion.i);
-        
-        t2 = t2 > 1 ? 1.0 : t2;
-        t2 = t2 < -1 ? -1.0 : t2;
-        
-        eulerRotations.pitch = UnitConversions::RadiansToDegrees(asin(t2));
-
-        float t3 = +2.0 * (quaternion.real * quaternion.k + quaternion.i * quaternion.j);
-        float t4 = +1.0 - 2.0 * (quaternion.j * quaternion.j + quaternion.k * quaternion.k);
-        eulerRotations.yaw = UnitConversions::RadiansToDegrees(atan2(t3, t4));
-
-        return true;
-    }
-
-    return false;
-}
-
 
 bool IMU_9DOF::GetQuaternion(Quaternion& quaternion, DirectionalValues accel, DirectionalValues gyro, DirectionalValues magnet)
 {
-    filter->update(gyro.x, gyro.y, gyro.z, accel.x, accel.y, accel.z, magnet.x, magnet.y, magnet.z);
+    // filter->update(gyro.x, gyro.y, gyro.z, accel.x, accel.y, accel.z, magnet.x, magnet.y, magnet.z);
 
-    float x;
-    float y;
-    float z;
-    float w;
+    // float x;
+    // float y;
+    // float z;
+    // float w;
 
-    filter->getQuaternion(&w, &x, &y, &z);
+    // filter->getQuaternion(&w, &x, &y, &z);
 
-    quaternion.real = w;
-    quaternion.i = x;
-    quaternion.j = y;
-    quaternion.k = z;
+    // quaternion.real = w;
+    // quaternion.i = x;
+    // quaternion.j = y;
+    // quaternion.k = z;
 
-    // ComputeQuaternion(quaternion, accel, gyro, magnet);
+    ComputeQuaternion(quaternion, accel, gyro, magnet);
 
 
     return true;
@@ -358,30 +259,3 @@ void IMU_9DOF::PrintQuaternion(Quaternion& quaternion)
     Serial.println(quaternion.k);
 }
 
-
-void IMU_9DOF::PrintEulerRotations(Euler& eulerRotations)
-{
-    Serial.print(eulerRotations.roll);
-    Serial.print("/");
-    Serial.print(eulerRotations.pitch);
-    Serial.print("/");
-    Serial.println(eulerRotations.yaw);
-}
-
-
-void IMU_9DOF::PrintCurrentPosition(DirectionalValues& accel)
-{
-    Serial.print("(");
-    Serial.print(posX);
-    Serial.print(", ");
-    Serial.print(posY);
-    Serial.print(", ");
-    Serial.print(posZ);
-    Serial.print(")   ");
-
-    Serial.print(accel.x);
-    Serial.print(", ");
-    Serial.print(accel.y);
-    Serial.print(", ");
-    Serial.println(accel.z);
-}

@@ -22,27 +22,12 @@ public:
         float k;    // sometimes denoted Z
     };
 
-    struct Euler
-    {
-        float roll;
-        float pitch;
-        float yaw;
-    };
-
     IMU_9DOF();
-    virtual bool GetEulerRotation(Euler& eulerRotations, DirectionalValues accel, DirectionalValues gyro, DirectionalValues magnet);
     virtual bool GetQuaternion(Quaternion& quaternion);
-    virtual bool GetGravityVector(DirectionalValues& gravityVector, DirectionalValues accel, DirectionalValues gyro, DirectionalValues magnet);
     virtual bool GetQuaternion(Quaternion& quaternion, DirectionalValues accel, DirectionalValues gyro, DirectionalValues magnet);
     static void PrintReadingsMagnetometer(DirectionalValues& magn);
     static void PrintQuaternion(Quaternion& quaternion);
-    static void PrintEulerRotations(Euler& eulerRotations);
-    void PrintCurrentPosition(DirectionalValues& accel);
     void GetAndPrintAllReadings();
-
-    void CorrectAccel(DirectionalValues& accel);
-    void UpdatePosition(DirectionalValues& correctedAccel, uint32_t timeSinceLastUpdate_us);
-
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -60,7 +45,7 @@ public:
     virtual bool GetMagnetometerVals(DirectionalValues& magn) = 0;
 
 protected:
-    Adafruit_Mahony* filter;
+    Adafruit_Madgwick* filter;
 
 private:
     uint32_t microsSinceLastTimeValuesUpdated;
@@ -74,18 +59,6 @@ private:
     float j1 = 0;
     float k0 = 0;
     float k1 = 0;
-
-    float gravX;
-    float gravY;
-    float gravZ;
-
-    float posX = 0;
-    float posY = 0;
-    float posZ = 0;
-    float velX = 0;
-    float velY = 0;
-    float velZ = 0;
-
 
 
     virtual void ComputeQuaternion(Quaternion& quaternion, DirectionalValues& accel, DirectionalValues& gyro, DirectionalValues& magnet);
