@@ -1,43 +1,100 @@
-#include "IMU_9DOF.h"
+#include "SensorFusion.h"
 
 
-IMU_9DOF::IMU_9DOF()
+
+/**
+ * @brief Constructor. Called when object is first instantiated
+ * 
+ * @param samplingRate the rate at which we are sampling the devices. THIS IS VERY IMPORTANT FOR THE FILTER. Approximately: 219 when printing quaternion,  309 when printing all dead reckoning info,  324 when printing just position
+ */
+SensorFusion::SensorFusion(float samplingRate)
 {
     filter = new Adafruit_Mahony();
-    filter->begin(101.0);    // 48  50  29
+    filter->begin(samplingRate); 
 }
 
-bool IMU_9DOF::GetQuaternion(Quaternion& quaternion)
+
+/**
+ * @brief Constructor. Called when object is first instantiated. The default sampling rate is 200 but YOU SHOULD CALL THE OVERLOADED METHOD INSTEAD
+ */
+SensorFusion::SensorFusion()
 {
+    filter = new Adafruit_Mahony();
+    filter->begin(200); 
+}
+
+
+/**
+ * @brief Destructor. Called when object is destroyed and will clean up allocated memory
+ */
+SensorFusion::~SensorFusion()
+{
+    delete filter; 
+}
+
+
+/**
+ * @brief Initizalizes both the MPU6500 and the LIS3MDL
+ */
+void SensorFusion::Init()
+{
+    InitIMU();
+    InitCompass();
+}
+
+
+/**
+ * @brief Blocks until the device is calibrated. This works by waiting until acceleration is completely corrected by gravity
+ */
+void SensorFusion::Calibrate()
+{
+    DirectionalValues magnet;
     DirectionalValues accel;
     DirectionalValues gyro;
-    DirectionalValues magnetometer;
+    DirectionalValues gravity;
+    Quaternion quaternion;
 
-    if (!(GetAccelVals(accel) && GetGyroVals(gyro) && GetMagnetometerVals(magnetometer)))
+    Serial.println("Calibrating... hold still");
+
+    while (1)
     {
-        // one of the values was not successfully grabbed, can't calculate quaternion
-        Serial.println("Can't get sensor vals");
-        return false;
+        // Get all the sensor readings and skip to next loop try if one fails
+        if (!GetMagnetometerVals(magnet))
+            continue;
+        if (!GetAccelVals(accel))
+            continue;
+        if (!GetGyroVals(gyro))
+            continue;
+        
+        // Try and get the Quaternion
+        if (GetQuaternion(quaternion, accel, gyro, magnet))
+        {
+            // Get the gravity vector and correct the acceleration
+            GetGravityVector(gravity, accel, gyro, magnet);
+            CorrectAccel(accel);
+
+            if (accel.x <= 0.01 && accel.x >= -0.01 && accel.y <= 0.01 && accel.y >= -0.01 && accel.z <= 0.01 && accel.z >= -0.01)
+            {
+                break;
+            }
+        }
     }
 
-    filter->update(gyro.x, gyro.y, gyro.z, accel.x, accel.y, accel.z, magnetometer.x, magnetometer.y, magnetometer.z);
-
-    float x;
-    float y;
-    float z;
-    float w;
-
-    filter->getQuaternion(&w, &x, &y, &z);
-
-    quaternion.real = w;
-    quaternion.i = x;
-    quaternion.j = y;
-    quaternion.k = z;
-
-    return true;
+    Serial.println("Device Calibrated!");
 }
 
-bool IMU_9DOF::GetGravityVector(DirectionalValues& gravityVector, DirectionalValues accel, DirectionalValues gyro, DirectionalValues magnet)
+
+/**
+ * @brief Gets the gravity vector. Basically tells the force of gravity in all 3 directions
+ * 
+ * @param gravityVector this is populated with the newly calculated forces of gravity
+ * @param accel the acceleration readings to update the filter with
+ * @param gyro the gyroscope readings to update the filter with
+ * @param magnet the compass readings to update the filter with
+ * 
+ * @returns bool - if the gravityVector struct was successfully (true) populated or not (false)
+ */
+bool SensorFusion::GetGravityVector(DirectionalValues& gravityVector, DirectionalValues accel, DirectionalValues gyro, DirectionalValues magnet)
 {
     // float x, y, z;
 
@@ -49,7 +106,7 @@ bool IMU_9DOF::GetGravityVector(DirectionalValues& gravityVector, DirectionalVal
 
 
     
-    Euler eulerRotation;
+    EulerRotations eulerRotation;
     GetEulerRotation(eulerRotation, accel, gyro, magnet);
 
     gravityVector.z = cos(UnitConversions::DegreesToRadians(eulerRotation.roll)) * cos(UnitConversions::DegreesToRadians(eulerRotation.pitch));
@@ -64,7 +121,13 @@ bool IMU_9DOF::GetGravityVector(DirectionalValues& gravityVector, DirectionalVal
     return true;
 }
 
-void IMU_9DOF::CorrectAccel(DirectionalValues& accel)
+
+/**
+ * @brief Corrects the raw acceleration readings and repopulates the passed in struct with the corrected values
+ * 
+ * @param accel the acceleration readings to correct. When the function call is finished this will now be populated with the corrected values
+ */
+void SensorFusion::CorrectAccel(DirectionalValues& accel)
 {
     accel.x -= gravX;
     accel.y -= gravY;
@@ -72,10 +135,15 @@ void IMU_9DOF::CorrectAccel(DirectionalValues& accel)
 }
 
 
-void IMU_9DOF::UpdatePosition(DirectionalValues& correctedAccel, uint32_t timeSinceLastUpdate_us, bool& newMeasureReady)
+/**
+ * @brief Updates the current position estimate using Dead Reckoning
+ * 
+ * @param correctedAccel the acceleration after it has been corrected from gravity
+ * @param timeSinceLastUpdate_us the time in microseconds since this method was last called.
+ */
+void SensorFusion::UpdatePosition(DirectionalValues& correctedAccel, uint32_t timeSinceLastUpdate_us)
 {
     double accelTermX, accelTermY, accelTermZ;
-    // Serial.println(timeSinceLastUpdate_us);
 
     const double errorMargin = 0.03;
     const double neg_errorMargin = -0.03;
@@ -119,21 +187,18 @@ void IMU_9DOF::UpdatePosition(DirectionalValues& correctedAccel, uint32_t timeSi
         numZeroX = 0;
         velX = 0.0f;
         // posX = 0.0f;
-        // newMeasureReady = true;
     }
     if (numZeroY >= 3)
     {
         numZeroY = 0;
         velY = 0.0f;
         // posY = 0.0f;
-        // newMeasureReady = true;
     }
     if (numZeroZ >= 3)
     {
         numZeroZ = 0;
         velZ = 0.0f;
         // posZ = 0.0f;
-        // newMeasureReady = true;
     }
 
     double timeSinceLastUpdate_sec = timeSinceLastUpdate_us * 0.000001;
@@ -154,7 +219,17 @@ void IMU_9DOF::UpdatePosition(DirectionalValues& correctedAccel, uint32_t timeSi
 }
 
 
-bool IMU_9DOF::GetEulerRotation(Euler& eulerRotations, DirectionalValues accel, DirectionalValues gyro, DirectionalValues magnet)
+/**
+ * @brief Gets the Euler Rotation instead of Quaternion. This is a different way of seeing 3D orientation
+ * 
+ * @param eulerRotations this is populated with the newly updated values
+ * @param accel the acceleration readings to update the filter with
+ * @param gyro the gyroscope readings to update the filter with
+ * @param magnet the compass readings to update the filter with
+ * 
+ * @returns bool - if the eulerRotations struct was successfully (true) populated or not (false)
+ */
+bool SensorFusion::GetEulerRotation(EulerRotations& eulerRotations, DirectionalValues accel, DirectionalValues gyro, DirectionalValues magnet)
 {
     Quaternion quaternion;
     if (GetQuaternion(quaternion, accel, gyro, magnet))
@@ -181,7 +256,55 @@ bool IMU_9DOF::GetEulerRotation(Euler& eulerRotations, DirectionalValues accel, 
 }
 
 
-bool IMU_9DOF::GetQuaternion(Quaternion& quaternion, DirectionalValues accel, DirectionalValues gyro, DirectionalValues magnet)
+/**
+ * @brief Gets a Quaternion based on the filter. This takes readings from the default sensors
+ * 
+ * @param gravityVector this is populated with the newly calculated Quaternion
+ * 
+ * @returns bool - if the Quaternion struct was successfully (true) populated or not (false)
+ */
+bool SensorFusion::GetQuaternion(Quaternion& quaternion)
+{
+    DirectionalValues accel;
+    DirectionalValues gyro;
+    DirectionalValues magnetometer;
+
+    if (!(GetAccelVals(accel) && GetGyroVals(gyro) && GetMagnetometerVals(magnetometer)))
+    {
+        // one of the values was not successfully grabbed, can't calculate quaternion
+        Serial.println("Can't get sensor vals");
+        return false;
+    }
+
+    filter->update(gyro.x, gyro.y, gyro.z, accel.x, accel.y, accel.z, magnetometer.x, magnetometer.y, magnetometer.z);
+
+    float x;
+    float y;
+    float z;
+    float w;
+
+    filter->getQuaternion(&w, &x, &y, &z);
+
+    quaternion.real = w;
+    quaternion.i = x;
+    quaternion.j = y;
+    quaternion.k = z;
+
+    return true;
+}
+
+
+/**
+ * @brief Gets the quaternion based on a filter after updating with passed in values
+ * 
+ * @param quaternion the quaternion to populate with data
+ * @param accel the acceleration readings to update the filter with
+ * @param gyro the gyroscope readings to update the filter with
+ * @param magnet the compass readings to update the filter with
+ * 
+ * @returns bool - if the Quaternion struct was successfully (true) populated or not (false)
+ */
+bool SensorFusion::GetQuaternion(Quaternion& quaternion, DirectionalValues accel, DirectionalValues gyro, DirectionalValues magnet)
 {
     filter->update(gyro.x, gyro.y, gyro.z, accel.x, accel.y, accel.z, magnet.x, magnet.y, magnet.z);
 
@@ -201,7 +324,15 @@ bool IMU_9DOF::GetQuaternion(Quaternion& quaternion, DirectionalValues accel, Di
 }
 
 
-void IMU_9DOF::ComputeQuaternion(Quaternion& quaternion, DirectionalValues& accel, DirectionalValues& gyro, DirectionalValues& magnet)
+/**
+ * @brief Sean's attempt at manually computing Quaternions. You can ignore this one
+ * 
+ * @param quaternion
+ * @param accel
+ * @param gyro
+ * @param magnet
+ */
+void SensorFusion::ComputeQuaternion(Quaternion& quaternion, DirectionalValues& accel, DirectionalValues& gyro, DirectionalValues& magnet)
 {
     const double beta = 0.6045998;
 
@@ -307,18 +438,7 @@ void IMU_9DOF::ComputeQuaternion(Quaternion& quaternion, DirectionalValues& acce
 }
 
 
-void IMU_9DOF::PrintReadingsMagnetometer(DirectionalValues &magn)
-{
-    Serial.print("Mag: ");
-    Serial.print(magn.x);
-    Serial.print(", ");
-    Serial.print(magn.y);
-    Serial.print(", ");
-    Serial.println(magn.z);
-}
-
-
-void IMU_9DOF::GetAndPrintAllReadings()
+void SensorFusion::GetAndPrintAllReadings()
 {
     DirectionalValues accel;
     DirectionalValues gyro;
@@ -348,7 +468,7 @@ void IMU_9DOF::GetAndPrintAllReadings()
 }
 
 
-void IMU_9DOF::PrintQuaternion(Quaternion& quaternion)
+void SensorFusion::PrintQuaternion(Quaternion& quaternion)
 {
     // Serial.print("Quaternion (r, i, j, k):  ");
     // Serial.print(quaternion.real);
@@ -368,7 +488,7 @@ void IMU_9DOF::PrintQuaternion(Quaternion& quaternion)
 }
 
 
-void IMU_9DOF::PrintEulerRotations(Euler& eulerRotations)
+void SensorFusion::PrintEulerRotations(EulerRotations& eulerRotations)
 {
     Serial.print(eulerRotations.roll);
     Serial.print("/");
@@ -378,7 +498,17 @@ void IMU_9DOF::PrintEulerRotations(Euler& eulerRotations)
 }
 
 
-void IMU_9DOF::PrintCurrentPosition(DirectionalValues& accel)
+void SensorFusion::PrintCurrentPosition()
+{
+    Serial.print(posX);
+    Serial.print("/");
+    Serial.print(posY);
+    Serial.print("/");
+    Serial.println(posZ);
+}
+
+
+void SensorFusion::PrintDetailedDeadReckoning(DirectionalValues& accel)
 {
     Serial.print("Position(m) (x, y, z): (");
     Serial.print(posX);

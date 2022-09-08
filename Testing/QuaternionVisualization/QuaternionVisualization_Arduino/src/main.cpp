@@ -1,103 +1,103 @@
 #include <Arduino.h>
-#include "IMU_9DOF_BNO08x.h"
-#include "IMU_9DOF_9250.h"
+#include "SensorFusion.h"
 
-IMU_9DOF_BNO08x bno;
-IMU_9DOF_9250 mpu;
+// comment this out to do dead reckoning, leave it uncommented to calculate quaternions
+// #define RunQuaternionCalculation
+
+void DeadReckoning();
+void QuaternionCalculation();
 
 uint16_t count;
 uint32_t startTime;
-
-IMU_9DOF::Quaternion quaternion;
-IMU_9DOF::Euler euler;
-IMU_6DOF::DirectionalValues grav;
-IMU_6DOF::DirectionalValues accel;
-IMU_6DOF::DirectionalValues gyro;
-IMU_6DOF::DirectionalValues magnet;
-
 uint32_t lastUpdate = micros();
 
+
+// Global structs used to hold our data so that we aren't reallocating it every loop
+DataStructures::Quaternion quaternion;
+DataStructures::EulerRotations euler;
+DataStructures::DirectionalValues grav;
+DataStructures::DirectionalValues accel;
+DataStructures::DirectionalValues gyro;
+DataStructures::DirectionalValues magnet;
+
+// The SensorFusion object. This wraps both the IMU and Magnetometer in one and performs data manipulation with them
+#ifdef RunQuaternionCalculation
+SensorFusion sensors(219);
+#else
+SensorFusion sensors(324);
+#endif
+
+
+/**
+ * @brief The setup() method is an Arduino special function. It runs automatically and is ALWAYS the first method to run
+ */
 void setup()
 {
+    // begin the Serial bus @9600 baud rate 
     Serial.begin(9600);
+    // wait for the Serial bus to connect (need to open serial port on terminal or processing for this to pass)
     while (!Serial);
 
-    bno.Init();
-    mpu.Init();
+
+    // Initialize the IMU and Magnetometer
+    sensors.Init();
+    // Calibrate the sensors. This may take some time
+    sensors.Calibrate();
 }
 
+
+/**
+ * @brief The loop() method is an Arduino special function. It runs automatically after setup() completes and continuously loops
+ * Choose either QuaternionCalculation OR DeadReckoning
+ */
 void loop()
 {
-    startTime = millis();
-    count = 0;
-    while (startTime + 1000 > millis())
-    {
-        uint32_t measureBeginTime = micros();
-        if (!bno.GetMagnetometerVals(magnet))
-        {
-            Serial.println("m");
-            break;
-        }
-        if (!mpu.GetAccelVals(accel))
-        {
-            break;
-        }
-        if (!mpu.GetGyroVals(gyro))
-        {
-            break;
-        }
-
-        if (bno.GetQuaternion(quaternion, accel, gyro, magnet))
-        {
-            // IMU_9DOF::PrintEulerRotations(euler);
-
-            // IMU_9DOF::PrintQuaternion(quaternion);
-            bno.GetGravityVector(grav, accel, gyro, magnet);
-            // IMU_6DOF::PrintReadingsAccel(grav);
-
-            bno.CorrectAccel(accel);
-            // IMU_6DOF::PrintReadingsAccel(accel);
-
-            lastUpdate = micros();
-            bool isNewPositionReady = false;
-
-            bno.UpdatePosition(accel, lastUpdate - measureBeginTime, isNewPositionReady);
-            
-            // if (isNewPositionReady)
-            bno.PrintCurrentPosition(accel);
-        }
-
-        count++;
-    }
-    
-    // print how many readings we got in 1 second. Feed this in constructor of filter
-    Serial.println(count);
+#ifdef RunQuaternionCalculation
+    QuaternionCalculation();
+#else
+    DeadReckoning();
+#endif
 }
 
 
-
-void loop2()
+/**
+ * @brief The method for testing our kind of 'dead reckoning' approach
+ */
+void DeadReckoning()
 {
     startTime = millis();
     count = 0;
     while (startTime + 1000 > millis())
     {
-        if (!bno.GetMagnetometerVals(magnet))
-        {
+        // Log the time when we started this measurement
+        uint32_t measureBeginTime = micros();
+
+        // Get all the sensor readings and break out of loop if one fails
+        if (!sensors.GetMagnetometerVals(magnet))
             break;
-        }
-        if (!mpu.GetAccelVals(accel))
-        {
+        if (!sensors.GetAccelVals(accel))
             break;
-        }
-        if (!mpu.GetGyroVals(gyro))
-        {
+        if (!sensors.GetGyroVals(gyro))
             break;
+        
+        // Try and get the Quaternion
+        if (sensors.GetQuaternion(quaternion, accel, gyro, magnet))
+        {
+            // Get the gravity vector and correct the acceleration
+            sensors.GetGravityVector(grav, accel, gyro, magnet);
+            sensors.CorrectAccel(accel);
+
+            // Log the time when we finished the measurement 
+            lastUpdate = micros();
+            sensors.UpdatePosition(accel, lastUpdate - measureBeginTime);
+            
+            // Print out our current position estimate
+            sensors.PrintCurrentPosition();
+            
+            // Print out all detailed values related to Dead Reckoning
+            // sensors.PrintDetailedDeadReckoning(accel);
         }
 
-        bno.GetQuaternion(quaternion, accel, gyro, magnet);
-
-        IMU_9DOF::PrintQuaternion(quaternion);
         count++;
     }
     
@@ -106,4 +106,30 @@ void loop2()
 }
 
 
+/**
+ * @brief The method for testing Quaternion fetching
+ */
+void QuaternionCalculation()
+{
+    startTime = millis();
+    count = 0;
+    while (startTime + 1000 > millis())
+    {
+        // Get all the sensor readings and break out of loop if one fails
+        if (!sensors.GetMagnetometerVals(magnet))
+            break;
+        if (!sensors.GetAccelVals(accel))
+            break;
+        if (!sensors.GetGyroVals(gyro))
+            break;
 
+        sensors.GetQuaternion(quaternion, accel, gyro, magnet);
+
+        SensorFusion::PrintQuaternion(quaternion);
+        delay(2);
+        count++;
+    }
+    
+    // print how many readings we got in 1 second. Feed this in constructor of filter
+    Serial.println(count);
+}
