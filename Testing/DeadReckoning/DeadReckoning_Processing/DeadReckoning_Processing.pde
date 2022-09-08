@@ -74,7 +74,7 @@ void HandleZoomAndPerspective()
     else if (mouseButton == RIGHT)  zoom -= inc;
   
   // Change height of the camera with mouseY
-  camera(30.0 + mouseX - (zoom / 10), mouseY - (zoom / 10), 200.0 - (zoom / 8), // eyeX, eyeY, eyeZ
+  camera(30.0 + mouseX - (zoom / 10), mouseY - (zoom / 10), 220.0 - (zoom / 8), // eyeX, eyeY, eyeZ
          0.0, 0.0, 0.0, // centerX, centerY, centerZ
          0.0, 0.0, -1.0); // upX, upY, upZ
 }
