@@ -2,7 +2,7 @@
 #include "SensorFusion.h"
 
 // comment this out to do dead reckoning, leave it uncommented to calculate quaternions
-// #define RunQuaternionCalculation
+#define RUN_QUATERNION_CALCULATION
 
 void DeadReckoning();
 void QuaternionCalculation();
@@ -21,7 +21,7 @@ DataStructures::DirectionalValues gyro;
 DataStructures::DirectionalValues magnet;
 
 // The SensorFusion object. This wraps both the IMU and Magnetometer in one and performs data manipulation with them
-#ifdef RunQuaternionCalculation
+#ifdef RUN_QUATERNION_CALCULATION
 SensorFusion sensors(219);
 #else
 SensorFusion sensors(324);
@@ -34,15 +34,18 @@ SensorFusion sensors(324);
 void setup()
 {
     // begin the Serial bus @9600 baud rate 
-    Serial.begin(9600);
+    Serial.begin(115200);
     // wait for the Serial bus to connect (need to open serial port on terminal or processing for this to pass)
     while (!Serial);
 
 
     // Initialize the IMU and Magnetometer
     sensors.Init();
+
+    #ifndef RUN_QUATERNION_CALCULATION
     // Calibrate the sensors. This may take some time
     sensors.Calibrate();
+    #endif
 }
 
 
@@ -52,7 +55,7 @@ void setup()
  */
 void loop()
 {
-#ifdef RunQuaternionCalculation
+#ifdef RUN_QUATERNION_CALCULATION
     QuaternionCalculation();
 #else
     DeadReckoning();

@@ -85,6 +85,17 @@ bool IMU_MPU6500::GetAccelVals(DirectionalValues& accel)
 
 
 /**
+ * @brief Returns the net acceleration read by the device
+ * 
+ * @param netAccel the net acceleration of the sensor
+ */
+float IMU_MPU6500::GetNetAcceleration(DirectionalValues& accel)
+{
+    return sqrt(pow(accel.x, 2) + pow(accel.y, 2) + pow(accel.z, 2));
+}
+
+
+/**
  * @brief Prints the accel values to the terminal
  *
  * @param accel DirectionalValues struct that contains the readings to print

@@ -9,8 +9,8 @@ float gx, gy, gz, ax, ay, az, mx, my, mz;
 float roll, pitch, yaw;
 
 void setup() {
-  size (1800, 1200, P3D);
-  myPort = new Serial(this, "COM6", 9600); // starts the serial communication
+  size (1200, 800, P3D);
+  myPort = new Serial(this, "COM3", 9600); // starts the serial communication
   myPort.bufferUntil('\n');
   
   r = 1.0;

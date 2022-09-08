@@ -16,6 +16,7 @@ public:
     // Getters
     virtual bool GetGyroVals(DirectionalValues& gyro);
     virtual bool GetAccelVals(DirectionalValues& accel);
+    virtual float GetNetAcceleration(DirectionalValues& accel);
 
     // Print Methods
     virtual void PrintReadingsGyro(DirectionalValues &gyro);

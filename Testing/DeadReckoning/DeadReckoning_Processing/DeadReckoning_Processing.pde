@@ -17,7 +17,7 @@ float lastX, lastY, lastZ;
 List<Point> points = new ArrayList<Point>();
 
 void setup() {
-  myPort = new Serial(this, "COM6", 9600); // starts the serial communication
+  myPort = new Serial(this, "COM3", 115200); // starts the serial communication
   myPort.bufferUntil('\n');
 
   size(1200, 800, P3D);
@@ -156,7 +156,13 @@ void serialEvent (Serial myPort) {
       x = float(items[0]);
       y = float(items[1]);
       z = float(items[2]);
-
+    }
+    else if (items.length == 1){
+      float scrubber = float(items[0]);
+       
+      if (scrubber == 777.77) {
+         points.clear(); 
+      }
     }
   }
 }

@@ -65,6 +65,8 @@ private:
     float posYCache = 0;
     float posZCache = 0;
 
+    uint16_t samplesTakenSinceReset = 0;
+
 
 
     virtual void ComputeQuaternion(Quaternion& quaternion, DirectionalValues& accel, DirectionalValues& gyro, DirectionalValues& magnet);

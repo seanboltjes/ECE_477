@@ -55,8 +55,11 @@ void SensorFusion::Calibrate()
     Quaternion quaternion;
 
     Serial.println("Calibrating... hold still");
+    delay(1000);
 
-    while (1)
+    uint8_t count = 0;
+
+    while (count < 50)
     {
         // Get all the sensor readings and skip to next loop try if one fails
         if (!GetMagnetometerVals(magnet))
@@ -75,7 +78,7 @@ void SensorFusion::Calibrate()
 
             if (accel.x <= 0.01 && accel.x >= -0.01 && accel.y <= 0.01 && accel.y >= -0.01 && accel.z <= 0.01 && accel.z >= -0.01)
             {
-                break;
+                count++;
             }
         }
     }
@@ -145,11 +148,11 @@ void SensorFusion::UpdatePosition(DirectionalValues& correctedAccel, uint32_t ti
 {
     double accelTermX, accelTermY, accelTermZ;
 
-    const double errorMargin = 0.03;
-    const double neg_errorMargin = -0.03;
+    const double errorMargin = 0.02;
+    const double neg_errorMargin = -0.02;
 
-    const double errorMarginVel = 0.001;
-    const double neg_errorMarginVel = -0.001;
+    const double errorMarginVel = 0.0001;
+    const double neg_errorMarginVel = -0.0001;
 
     if (correctedAccel.x < errorMargin && correctedAccel.x > neg_errorMargin)
     {
@@ -199,6 +202,22 @@ void SensorFusion::UpdatePosition(DirectionalValues& correctedAccel, uint32_t ti
         numZeroZ = 0;
         velZ = 0.0f;
         // posZ = 0.0f;
+    }
+
+    samplesTakenSinceReset++;
+
+
+    if (GetNetAcceleration(correctedAccel) > 1 && samplesTakenSinceReset > 100)
+    {
+        posX = 0;
+        posY = 0;
+        posZ = 0;
+        velX = 0.0f;
+        velY = 0.0f;
+        velZ = 0.0f;
+        Serial.println("777.77");
+
+        samplesTakenSinceReset = 0;
     }
 
     double timeSinceLastUpdate_sec = timeSinceLastUpdate_us * 0.000001;
