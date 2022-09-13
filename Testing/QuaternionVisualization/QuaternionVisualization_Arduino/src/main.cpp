@@ -2,7 +2,7 @@
 #include "SensorFusion.h"
 
 // comment this out to do dead reckoning, leave it uncommented to calculate quaternions
-#define RUN_QUATERNION_CALCULATION
+// #define RUN_QUATERNION_CALCULATION
 
 void DeadReckoning();
 void QuaternionCalculation();
@@ -20,13 +20,8 @@ DataStructures::DirectionalValues accel;
 DataStructures::DirectionalValues gyro;
 DataStructures::DirectionalValues magnet;
 
-// The SensorFusion object. This wraps both the IMU and Magnetometer in one and performs data manipulation with them
-#ifdef RUN_QUATERNION_CALCULATION
-SensorFusion sensors(219);
-#else
-SensorFusion sensors(336);
-// SensorFusion sensors(202);
-#endif
+
+SensorFusion sensors;
 
 
 /**
@@ -71,36 +66,18 @@ void loop()
  */
 void DeadReckoning()
 {
-    startTime = millis();
-    count = 0;
-    while (startTime + 1000 > millis())
-    {
-        // Log the time when we started this measurement
-        uint32_t measureBeginTime = micros();
-        
-        // Try and get the Quaternion
-        if (sensors.GetQuaternion(quaternion))
-        {
-            // Get the gravity vector and correct the acceleration
-            sensors.GetGravityVector(grav, quaternion);
-            sensors.CorrectAccel(accel);
-
-            // Log the time when we finished the measurement 
-            lastUpdate = micros();
-            sensors.UpdatePosition(accel, lastUpdate - measureBeginTime);
-            
-            // Print out our current position estimate
-            sensors.PrintCurrentPosition();
-            
-            // Print out all detailed values related to Dead Reckoning
-            // sensors.PrintDetailedDeadReckoning(accel);
-        }
-
-        count++;
-    }
+    // Log the time when we started this measurement
+    uint32_t measureBeginTime = micros();
     
-    // print how many readings we got in 1 second. Feed this in constructor of filter
-    Serial.println(count);
+    // Try and get acceleration
+    while (!sensors.GetAccelVals(accel));
+
+    // Log the time when we finished the measurement 
+    lastUpdate = micros();
+    sensors.UpdatePosition(accel, lastUpdate - measureBeginTime);
+    
+    // Print out our current position estimate
+    sensors.PrintCurrentPosition();
 }
 
 
@@ -115,7 +92,7 @@ void QuaternionCalculation()
     {
         sensors.GetQuaternion(quaternion);
 
-        SensorFusion::PrintQuaternion(quaternion);
+        sensors.PrintQuaternion(quaternion);
         delay(2);
         count++;
     }
