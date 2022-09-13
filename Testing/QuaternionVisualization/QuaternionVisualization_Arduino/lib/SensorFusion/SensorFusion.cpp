@@ -44,6 +44,36 @@ void SensorFusion::Init()
 
 
 /**
+ * @brief Sets the reports (data points) that the BNO will produce.
+ * 
+ * @return bool - true if successful false if not successful
+ */
+bool SensorFusion::SetReports() 
+{
+    bool allSucces = true;
+
+    if (!imu->enableReport(SH2_ACCELEROMETER)) {
+        Serial.println("Could not enable accelerometer");
+        allSucces = false;
+    }
+    if (!imu->enableReport(SH2_GYROSCOPE_CALIBRATED)) {
+        Serial.println("Could not enable gyroscope");
+        allSucces = false;
+    }
+    if (!imu->enableReport(SH2_MAGNETIC_FIELD_CALIBRATED)) {
+        Serial.println("Could not enable magnetic field calibrated");
+        allSucces = false;
+    }
+    if (!imu->enableReport(SH2_ROTATION_VECTOR)) {
+        Serial.println("Could not enable rotation vector");
+        allSucces = false;
+    }
+
+    return allSucces;
+}
+
+
+/**
  * @brief Blocks until the device is calibrated. This works by waiting until acceleration is completely corrected by gravity
  */
 void SensorFusion::Calibrate()
@@ -73,7 +103,7 @@ void SensorFusion::Calibrate()
         if (GetQuaternion(quaternion, accel, gyro, magnet))
         {
             // Get the gravity vector and correct the acceleration
-            GetGravityVector(gravity, accel, gyro, magnet);
+            GetGravityVector(gravity, quaternion);
             CorrectAccel(accel);
 
             if (accel.x <= 0.01 && accel.x >= -0.01 && accel.y <= 0.01 && accel.y >= -0.01 && accel.z <= 0.01 && accel.z >= -0.01)
@@ -91,13 +121,11 @@ void SensorFusion::Calibrate()
  * @brief Gets the gravity vector. Basically tells the force of gravity in all 3 directions
  * 
  * @param gravityVector this is populated with the newly calculated forces of gravity
- * @param accel the acceleration readings to update the filter with
- * @param gyro the gyroscope readings to update the filter with
- * @param magnet the compass readings to update the filter with
+ * @param quaternion the quaternion to use for getting the vector
  * 
  * @returns bool - if the gravityVector struct was successfully (true) populated or not (false)
  */
-bool SensorFusion::GetGravityVector(DirectionalValues& gravityVector, DirectionalValues accel, DirectionalValues gyro, DirectionalValues magnet)
+bool SensorFusion::GetGravityVector(DirectionalValues& gravityVector, Quaternion& quaternion)
 {
     // float x, y, z;
 
@@ -110,12 +138,15 @@ bool SensorFusion::GetGravityVector(DirectionalValues& gravityVector, Directiona
 
     
     EulerRotations eulerRotation;
-    GetEulerRotation(eulerRotation, accel, gyro, magnet);
+    GetEulerRotation(eulerRotation, quaternion);
 
     gravityVector.z = cos(UnitConversions::DegreesToRadians(eulerRotation.roll)) * cos(UnitConversions::DegreesToRadians(eulerRotation.pitch));
     gravityVector.y = sin(UnitConversions::DegreesToRadians(eulerRotation.roll)) * cos(UnitConversions::DegreesToRadians(eulerRotation.pitch));
     gravityVector.x = -1 * sin(UnitConversions::DegreesToRadians(eulerRotation.pitch));
 
+    // gravityVector.x = cos(UnitConversions::DegreesToRadians(eulerRotation.yaw)) * cos(UnitConversions::DegreesToRadians(eulerRotation.pitch));
+    // gravityVector.y = sin(UnitConversions::DegreesToRadians(eulerRotation.yaw)) * cos(UnitConversions::DegreesToRadians(eulerRotation.pitch));
+    // gravityVector.z = -1 * sin(UnitConversions::DegreesToRadians(eulerRotation.pitch));
     
     gravX = gravityVector.x;
     gravY = gravityVector.y;
@@ -224,6 +255,8 @@ void SensorFusion::UpdatePosition(DirectionalValues& correctedAccel, uint32_t ti
     double timeSinceLastUpdate_sec_squared = pow(timeSinceLastUpdate_sec, 2);
     double accelTermCoeff = timeSinceLastUpdate_sec_squared * 0.5;
 
+
+
     velX += timeSinceLastUpdate_sec * correctedAccel.x;
     velY += timeSinceLastUpdate_sec * correctedAccel.y;
     velZ += timeSinceLastUpdate_sec * correctedAccel.z;
@@ -248,7 +281,7 @@ void SensorFusion::UpdatePosition(DirectionalValues& correctedAccel, uint32_t ti
  * 
  * @returns bool - if the eulerRotations struct was successfully (true) populated or not (false)
  */
-bool SensorFusion::GetEulerRotation(EulerRotations& eulerRotations, DirectionalValues accel, DirectionalValues gyro, DirectionalValues magnet)
+bool SensorFusion::GetEulerRotation(EulerRotations& eulerRotations, DirectionalValues& accel, DirectionalValues& gyro, DirectionalValues& magnet)
 {
     Quaternion quaternion;
     if (GetQuaternion(quaternion, accel, gyro, magnet))
@@ -272,6 +305,35 @@ bool SensorFusion::GetEulerRotation(EulerRotations& eulerRotations, DirectionalV
     }
 
     return false;
+}
+
+
+/**
+ * @brief Gets the Euler Rotation instead of Quaternion. This is a different way of seeing 3D orientation
+ * 
+ * @param eulerRotations this is populated with the newly updated values
+ * @param quaternion the quaternion to use to convert
+ * 
+ * @returns bool - if the eulerRotations struct was successfully (true) populated or not (false)
+ */
+bool SensorFusion::GetEulerRotation(EulerRotations& eulerRotations, Quaternion& quaternion)
+{
+    float t0 = 2.0 * (quaternion.real * quaternion.i + quaternion.j * quaternion.k);
+    float t1 = 1.0 - 2.0 * (quaternion.i * quaternion.i + quaternion.j * quaternion.j);
+    eulerRotations.roll = UnitConversions::RadiansToDegrees(atan2(t0, t1));
+
+    float t2 = 2.0 * (quaternion.real * quaternion.j - quaternion.k * quaternion.i);
+    
+    t2 = t2 > 1 ? 1.0 : t2;
+    t2 = t2 < -1 ? -1.0 : t2;
+    
+    eulerRotations.pitch = UnitConversions::RadiansToDegrees(asin(t2));
+
+    float t3 = 2.0 * (quaternion.real * quaternion.k + quaternion.i * quaternion.j);
+    float t4 = 1.0 - 2.0 * (quaternion.j * quaternion.j + quaternion.k * quaternion.k);
+    eulerRotations.yaw = UnitConversions::RadiansToDegrees(atan2(t3, t4));
+
+    return true;
 }
 
 
@@ -304,11 +366,6 @@ bool SensorFusion::GetQuaternion(Quaternion& quaternion)
 
     filter->getQuaternion(&w, &x, &y, &z);
 
-    quaternion.real = w;
-    quaternion.i = x;
-    quaternion.j = y;
-    quaternion.k = z;
-
     return true;
 }
 
@@ -323,7 +380,7 @@ bool SensorFusion::GetQuaternion(Quaternion& quaternion)
  * 
  * @returns bool - if the Quaternion struct was successfully (true) populated or not (false)
  */
-bool SensorFusion::GetQuaternion(Quaternion& quaternion, DirectionalValues accel, DirectionalValues gyro, DirectionalValues magnet)
+bool SensorFusion::GetQuaternion(Quaternion& quaternion, DirectionalValues& accel, DirectionalValues& gyro, DirectionalValues& magnet)
 {
     filter->update(gyro.x, gyro.y, gyro.z, accel.x, accel.y, accel.z, magnet.x, magnet.y, magnet.z);
 
@@ -550,4 +607,17 @@ void SensorFusion::PrintDetailedDeadReckoning(DirectionalValues& accel)
     Serial.print(accel.y);
     Serial.print(", ");
     Serial.println(accel.z);
+}
+
+
+
+void SensorFusion::PrintGravityVector(DirectionalValues& gravity)
+{
+    Serial.print("Gravity Vector in g's (x, y, z):  ");
+    Serial.print(gravity.x);
+    Serial.print(", ");
+    Serial.print(gravity.y);
+    Serial.print(", ");
+    Serial.println(gravity.z);
+
 }

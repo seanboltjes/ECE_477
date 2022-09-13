@@ -2,7 +2,7 @@
 #include "SensorFusion.h"
 
 // comment this out to do dead reckoning, leave it uncommented to calculate quaternions
-#define RUN_QUATERNION_CALCULATION
+// #define RUN_QUATERNION_CALCULATION
 
 void DeadReckoning();
 void QuaternionCalculation();
@@ -24,7 +24,8 @@ DataStructures::DirectionalValues magnet;
 #ifdef RUN_QUATERNION_CALCULATION
 SensorFusion sensors(219);
 #else
-SensorFusion sensors(324);
+SensorFusion sensors(336);
+// SensorFusion sensors(202);
 #endif
 
 
@@ -44,7 +45,7 @@ void setup()
 
     #ifndef RUN_QUATERNION_CALCULATION
     // Calibrate the sensors. This may take some time
-    sensors.Calibrate();
+    // sensors.Calibrate();
     #endif
 
     // hello world
@@ -89,7 +90,7 @@ void DeadReckoning()
         if (sensors.GetQuaternion(quaternion, accel, gyro, magnet))
         {
             // Get the gravity vector and correct the acceleration
-            sensors.GetGravityVector(grav, accel, gyro, magnet);
+            sensors.GetGravityVector(grav, quaternion);
             sensors.CorrectAccel(accel);
 
             // Log the time when we finished the measurement 
