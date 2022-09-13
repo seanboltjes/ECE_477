@@ -17,7 +17,7 @@ float lastX, lastY, lastZ;
 List<Point> points = new ArrayList<Point>();
 
 void setup() {
-  myPort = new Serial(this, "COM6", 115200); // starts the serial communication
+  myPort = new Serial(this, "COM4", 115200); // starts the serial communication
   myPort.bufferUntil('\n');
 
   size(1200, 800, P3D);

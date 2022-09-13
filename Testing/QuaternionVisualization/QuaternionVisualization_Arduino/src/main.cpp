@@ -2,7 +2,7 @@
 #include "SensorFusion.h"
 
 // comment this out to do dead reckoning, leave it uncommented to calculate quaternions
-// #define RUN_QUATERNION_CALCULATION
+#define RUN_QUATERNION_CALCULATION
 
 void DeadReckoning();
 void QuaternionCalculation();
@@ -77,17 +77,9 @@ void DeadReckoning()
     {
         // Log the time when we started this measurement
         uint32_t measureBeginTime = micros();
-
-        // Get all the sensor readings and break out of loop if one fails
-        if (!sensors.GetMagnetometerVals(magnet))
-            break;
-        if (!sensors.GetAccelVals(accel))
-            break;
-        if (!sensors.GetGyroVals(gyro))
-            break;
         
         // Try and get the Quaternion
-        if (sensors.GetQuaternion(quaternion, accel, gyro, magnet))
+        if (sensors.GetQuaternion(quaternion))
         {
             // Get the gravity vector and correct the acceleration
             sensors.GetGravityVector(grav, quaternion);
@@ -121,15 +113,7 @@ void QuaternionCalculation()
     count = 0;
     while (startTime + 1000 > millis())
     {
-        // Get all the sensor readings and break out of loop if one fails
-        if (!sensors.GetMagnetometerVals(magnet))
-            break;
-        if (!sensors.GetAccelVals(accel))
-            break;
-        if (!sensors.GetGyroVals(gyro))
-            break;
-
-        sensors.GetQuaternion(quaternion, accel, gyro, magnet);
+        sensors.GetQuaternion(quaternion);
 
         SensorFusion::PrintQuaternion(quaternion);
         delay(2);

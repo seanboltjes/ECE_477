@@ -10,7 +10,7 @@ float roll, pitch, yaw;
 
 void setup() {
   size (1200, 800, P3D);
-  myPort = new Serial(this, "COM6", 115200); // starts the serial communication
+  myPort = new Serial(this, "COM4", 115200); // starts the serial communication
   myPort.bufferUntil('\n');
   
   r = 1.0;

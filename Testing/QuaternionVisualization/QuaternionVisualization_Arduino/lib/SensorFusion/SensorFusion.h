@@ -71,6 +71,7 @@ private:
     uint16_t samplesTakenSinceReset = 0;
 
     Adafruit_BNO08x* imu;
+
     bool SetReports();
     virtual void ComputeQuaternion(Quaternion& quaternion, DirectionalValues& accel, DirectionalValues& gyro, DirectionalValues& magnet);
 };
