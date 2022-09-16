@@ -2,13 +2,14 @@
 #include "SensorFusion.h"
 
 // comment this out to do dead reckoning, leave it uncommented to calculate quaternions
-// #define RUN_QUATERNION_CALCULATION
+#define RUN_QUATERNION_CALCULATION
 
 void DeadReckoning();
 void QuaternionCalculation();
 
 uint16_t count;
 uint32_t startTime;
+uint32_t startTimeCache;
 uint32_t lastUpdate = micros();
 
 
@@ -43,7 +44,8 @@ void setup()
     // sensors.Calibrate();
     #endif
 
-    // hello world
+    // Log the time when we started this measurement
+    startTime = micros();
 }
 
 
@@ -66,15 +68,63 @@ void loop()
  */
 void DeadReckoning()
 {
-    // Log the time when we started this measurement
-    uint32_t measureBeginTime = micros();
+    // startTime = millis();
+    // count = 0;
+
+    // while (startTime + 1000 > millis())
+    // {
+    //     if (sensors.GetGravityVector(grav))
+    //     {
+    //         // sensors.GetGravityVector(grav);
+    //         // sensors.GetGravityVector(grav);
+    //         // sensors.PrintGravityVector(grav);
+    //     }
+    //     else
+    //     {
+    //         Serial.println("Err");
+    //     }
+
+    //     if (sensors.GetLinearAccelVals(grav))
+    //     {
+    //         // sensors.GetGravityVector(grav);
+    //         // sensors.GetGravityVector(grav);
+    //         // sensors.PrintReadingsAccel(grav);
+    //     }
+    //     else
+    //     {
+    //         Serial.println("Err");
+    //     }
+
+    //     if (sensors.GetQuaternion(quaternion))
+    //     {
+    //         // sensors.GetGravityVector(grav);
+    //         // sensors.GetGravityVector(grav);
+    //         // sensors.PrintQuaternion(quaternion);
+    //     }
+    //     else
+    //     {
+    //         Serial.println("Err");
+    //     }
+    //     count++;
+    // }
+
+    // Serial.println(count);
+
+    // return;
+
+
+
     
     // Try and get acceleration
-    while (!sensors.GetAccelVals(accel));
+    while (!sensors.GetLinearAccelVals(accel));
 
     // Log the time when we finished the measurement 
     lastUpdate = micros();
-    sensors.UpdatePosition(accel, lastUpdate - measureBeginTime);
+    startTimeCache = lastUpdate;
+    
+    sensors.UpdatePosition(accel, lastUpdate - startTime);
+
+    startTime = startTimeCache;
     
     // Print out our current position estimate
     sensors.PrintCurrentPosition();

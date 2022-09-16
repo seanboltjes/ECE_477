@@ -7,9 +7,9 @@
  */
 void IMU_BNO085::InitIMU()
 {
-    Wire.setClock(100000);
+    Wire.setClock(400000);
     Wire.begin();
-    imu = new Adafruit_BNO08x();
+    imu = new Adafruit_BNO08x(12);
 
     while (!imu->begin_I2C())
     {
@@ -25,6 +25,20 @@ void IMU_BNO085::InitIMU()
 
 
     Serial.println("IMU Init Success");
+
+
+    for (int n = 0; n < imu->prodIds.numEntries; n++) {
+        Serial.print("Part ");
+        Serial.print(imu->prodIds.entry[n].swPartNumber);
+        Serial.print(": Version :");
+        Serial.print(imu->prodIds.entry[n].swVersionMajor);
+        Serial.print(".");
+        Serial.print(imu->prodIds.entry[n].swVersionMinor);
+        Serial.print(".");
+        Serial.print(imu->prodIds.entry[n].swVersionPatch);
+        Serial.print(" Build ");
+        Serial.println(imu->prodIds.entry[n].swBuildNumber);
+    }
 }
 
 
@@ -46,19 +60,27 @@ bool IMU_BNO085::SetReports()
 {
     bool allSucces = true;
 
-    if (!imu->enableReport(SH2_LINEAR_ACCELERATION)) {
-        Serial.println("Could not enable accelerometer");
+    // if (!imu->enableReport(SH2_ACCELEROMETER, 1000)) {
+    //     Serial.println("Could not enable accelerometer");
+    //     allSucces = false;
+    // }
+    if (!imu->enableReport(SH2_LINEAR_ACCELERATION, 1000)) {
+        Serial.println("Could not enable linear accelerometer");
         allSucces = false;
     }
-    if (!imu->enableReport(SH2_GYROSCOPE_CALIBRATED)) {
-        Serial.println("Could not enable gyroscope");
+    if (!imu->enableReport(SH2_GRAVITY, 1000)) {      //-- Can't get this one to update at a fast rate with LINEAR_ACCELERATION :(
+        Serial.println("Could not enable gravity");
         allSucces = false;
     }
-    if (!imu->enableReport(SH2_MAGNETIC_FIELD_CALIBRATED)) {
-        Serial.println("Could not enable magnetic field calibrated");
-        allSucces = false;
-    }
-    if (!imu->enableReport(SH2_ROTATION_VECTOR)) {
+    // if (!imu->enableReport(SH2_GYROSCOPE_CALIBRATED)) {
+    //     Serial.println("Could not enable gyroscope");
+    //     allSucces = false;
+    // }
+    // if (!imu->enableReport(SH2_MAGNETIC_FIELD_CALIBRATED)) {
+    //     Serial.println("Could not enable magnetic field calibrated");
+    //     allSucces = false;
+    // }
+    if (!imu->enableReport(SH2_ROTATION_VECTOR, 20000)) {
         Serial.println("Could not enable rotation vector");
         allSucces = false;
     }
@@ -105,7 +127,7 @@ bool IMU_BNO085::GetGyroVals(DirectionalValues& gyro)
  * 
  * @return bool - true if successful false if not successful
  */
-bool IMU_BNO085::GetAccelVals(DirectionalValues& accel)
+bool IMU_BNO085::GetLinearAccelVals(DirectionalValues& accel)
 {
     sh2_SensorValue_t sensorValue;
     uint32_t startTime = millis();
@@ -115,6 +137,37 @@ bool IMU_BNO085::GetAccelVals(DirectionalValues& accel)
         if (imu->getSensorEvent(&sensorValue)) 
         {
             if (sensorValue.sensorId == SH2_LINEAR_ACCELERATION)
+            {
+                accel.x = sensorValue.un.linearAcceleration.x;
+                accel.y = sensorValue.un.linearAcceleration.y;
+                accel.z = sensorValue.un.linearAcceleration.z;
+                
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+
+/**
+ * @brief Returns a struct with the current accel values (in g's)
+ * 
+ * @param accel the struct to be populated with acceleration data
+ * 
+ * @return bool - true if successful false if not successful
+ */
+bool IMU_BNO085::GetAccelVals(DirectionalValues& accel)
+{
+    sh2_SensorValue_t sensorValue;
+    uint32_t startTime = millis();
+
+    while (millis() < startTime + 1500)
+    {
+        if (imu->getSensorEvent(&sensorValue)) 
+        {
+            if (sensorValue.sensorId == SH2_ACCELEROMETER)
             {
                 accel.x = sensorValue.un.accelerometer.x;
                 accel.y = sensorValue.un.accelerometer.y;
@@ -189,6 +242,102 @@ bool IMU_BNO085::GetQuaternion(Quaternion& quaternion)
     }
 
     return false;
+}
+
+
+bool IMU_BNO085::GetGravityVector(DirectionalValues& gravity)
+{
+    sh2_SensorValue_t sensorValue;
+    uint32_t startTime = millis();
+
+    while (millis() < startTime + 1500)
+    {
+        if (imu->getSensorEvent(&sensorValue)) 
+        {
+            if (sensorValue.sensorId == SH2_GRAVITY)
+            {
+                gravity.x = sensorValue.un.gravity.x;
+                gravity.y = sensorValue.un.gravity.y;
+                gravity.z = sensorValue.un.gravity.z;
+
+                return true;
+            }
+        }
+    }
+
+    return false;
+
+    // DirectionalValues accel;
+    // DirectionalValues linAccel;
+
+    // if (GetAccelVals(accel))
+    // {
+    //     if (GetLinearAccelVals(linAccel))
+    //     {
+    //         gravity.x = accel.x - linAccel.x;
+    //         gravity.y = accel.y - linAccel.y;
+    //         gravity.z = accel.z - linAccel.z;
+    //         return true;
+    //     }
+    // }
+
+    // return false;
+
+    
+
+
+    // DirectionalValues linAccel;
+
+    // bool success = false;
+
+    // sh2_SensorValue_t sensorValue;
+    // uint32_t startTime = millis();
+
+    // while (millis() < startTime + 1500)
+    // {
+    //     if (imu->getSensorEvent(&sensorValue)) 
+    //     {
+    //         if (sensorValue.sensorId == SH2_LINEAR_ACCELERATION)
+    //         {
+    //             gravity.x = sensorValue.un.linearAcceleration.x;
+    //             gravity.y = sensorValue.un.linearAcceleration.y;
+    //             gravity.z = sensorValue.un.linearAcceleration.z;
+                
+    //             success = true;
+    //         }
+    //     }
+    // }
+
+    // if (!success)
+    // {
+    //     Serial.println("fail first");
+    //     return false;
+    // }
+    // Serial.println("first done");
+
+    // sh2_SensorValue_t sensorValue2;
+    // startTime = millis();
+
+    // return true;
+
+    // while (millis() < startTime + 1500)
+    // {
+    //     if (imu->getSensorEvent(&sensorValue2)) 
+    //     {
+    //         if (sensorValue2.sensorId == SH2_ACCELEROMETER)
+    //         {
+    //             gravity.x = linAccel.x - sensorValue2.un.accelerometer.x;
+    //             gravity.y = linAccel.y - sensorValue2.un.accelerometer.y;
+    //             gravity.z = linAccel.z - sensorValue2.un.accelerometer.z;
+                
+
+                
+    //             return true;
+    //         }
+    //     }
+    // }
+
+    // return false;
 }
 
 

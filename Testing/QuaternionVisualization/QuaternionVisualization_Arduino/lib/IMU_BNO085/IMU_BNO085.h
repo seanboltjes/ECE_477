@@ -15,8 +15,10 @@ public:
     // Getters
     virtual bool GetGyroVals(DirectionalValues& gyro);
     virtual bool GetAccelVals(DirectionalValues& accel);
+    virtual bool GetLinearAccelVals(DirectionalValues& accel);
     virtual bool GetMagnetometerVals(DirectionalValues& magn);
     virtual bool GetQuaternion(Quaternion& quaternion);
+    virtual bool GetGravityVector(DirectionalValues& gravity);
     virtual float GetNetAcceleration(DirectionalValues& accel);
 
     // Print Methods

@@ -23,7 +23,7 @@ public:
     virtual bool GetEulerRotation(EulerRotations& eulerRotations, DirectionalValues& accel, DirectionalValues& gyro, DirectionalValues& magnet);
 
     // Position Methods
-    virtual bool GetGravityVector(DirectionalValues& gravityVector, Quaternion& quaternion);
+    // virtual bool GetGravityVector(DirectionalValues& gravityVector, Quaternion& quaternion);
     virtual void CorrectAccel(DirectionalValues& accel);
     virtual void UpdatePosition(DirectionalValues& correctedAccel, uint32_t timeSinceLastUpdate_us);
 

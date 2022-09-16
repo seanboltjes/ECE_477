@@ -34,7 +34,7 @@ void SensorFusion::Calibrate()
         if (GetQuaternion(quaternion))
         {
             // Get the gravity vector and correct the acceleration
-            GetGravityVector(gravity, quaternion);
+            GetGravityVector(gravity);
             CorrectAccel(accel);
 
             if (accel.x <= 0.01 && accel.x >= -0.01 && accel.y <= 0.01 && accel.y >= -0.01 && accel.z <= 0.01 && accel.z >= -0.01)
@@ -48,43 +48,63 @@ void SensorFusion::Calibrate()
 }
 
 
-/**
- * @brief Gets the gravity vector. Basically tells the force of gravity in all 3 directions
- * 
- * @param gravityVector this is populated with the newly calculated forces of gravity
- * @param quaternion the quaternion to use for getting the vector
- * 
- * @returns bool - if the gravityVector struct was successfully (true) populated or not (false)
- */
-bool SensorFusion::GetGravityVector(DirectionalValues& gravityVector, Quaternion& quaternion)
-{
-    // float x, y, z;
+// /**
+//  * @brief Gets the gravity vector. Basically tells the force of gravity in all 3 directions
+//  * 
+//  * @param gravityVector this is populated with the newly calculated forces of gravity
+//  * @param quaternion the quaternion to use for getting the vector
+//  * 
+//  * @returns bool - if the gravityVector struct was successfully (true) populated or not (false)
+//  */
+// bool SensorFusion::GetGravityVector(DirectionalValues& gravityVector, Quaternion& quaternion)
+// {
+//     // float x, y, z;
 
-    // filter->getGravityVector(&x, &y, &z);
+//     // filter->getGravityVector(&x, &y, &z);
 
-    // gravityVector.x = x;
-    // gravityVector.y = y;
-    // gravityVector.z = z;
+//     // gravityVector.x = x;
+//     // gravityVector.y = y;
+//     // gravityVector.z = z;
+
+
+//     float i, j, k, r;
+
+//     i = quaternion.i;
+//     j = quaternion.j;
+//     k = quaternion.k;
+//     r = quaternion.real;
+
+
+//     gravityVector.x = 2 * (i * k + r * j);
+//     gravityVector.y = 2 * (j * k - r * i);
+//     gravityVector.z = 1 - (2 * (i * i - j * j));
+
+
+
+
+
+
+
 
 
     
-    EulerRotations eulerRotation;
-    GetEulerRotation(eulerRotation, quaternion);
+//     // EulerRotations eulerRotation;
+//     // GetEulerRotation(eulerRotation, quaternion);
 
-    gravityVector.z = cos(UnitConversions::DegreesToRadians(eulerRotation.roll)) * cos(UnitConversions::DegreesToRadians(eulerRotation.pitch));
-    gravityVector.y = sin(UnitConversions::DegreesToRadians(eulerRotation.roll)) * cos(UnitConversions::DegreesToRadians(eulerRotation.pitch));
-    gravityVector.x = -1 * sin(UnitConversions::DegreesToRadians(eulerRotation.pitch));
+//     // gravityVector.z = cos(UnitConversions::DegreesToRadians(eulerRotation.roll)) * cos(UnitConversions::DegreesToRadians(eulerRotation.pitch));
+//     // gravityVector.y = sin(UnitConversions::DegreesToRadians(eulerRotation.roll)) * cos(UnitConversions::DegreesToRadians(eulerRotation.pitch));
+//     // gravityVector.x = -1 * sin(UnitConversions::DegreesToRadians(eulerRotation.pitch));
 
-    // gravityVector.x = cos(UnitConversions::DegreesToRadians(eulerRotation.yaw)) * cos(UnitConversions::DegreesToRadians(eulerRotation.pitch));
-    // gravityVector.y = sin(UnitConversions::DegreesToRadians(eulerRotation.yaw)) * cos(UnitConversions::DegreesToRadians(eulerRotation.pitch));
-    // gravityVector.z = -1 * sin(UnitConversions::DegreesToRadians(eulerRotation.pitch));
+//     // // gravityVector.x = cos(UnitConversions::DegreesToRadians(eulerRotation.yaw)) * cos(UnitConversions::DegreesToRadians(eulerRotation.pitch));
+//     // // gravityVector.y = sin(UnitConversions::DegreesToRadians(eulerRotation.yaw)) * cos(UnitConversions::DegreesToRadians(eulerRotation.pitch));
+//     // // gravityVector.z = -1 * sin(UnitConversions::DegreesToRadians(eulerRotation.pitch));
     
-    gravX = gravityVector.x;
-    gravY = gravityVector.y;
-    gravZ = gravityVector.z;
+//     // gravX = gravityVector.x;
+//     // gravY = gravityVector.y;
+//     // gravZ = gravityVector.z;
 
-    return true;
-}
+//     return true;
+// }
 
 
 /**
@@ -347,7 +367,7 @@ void SensorFusion::PrintDetailedDeadReckoning(DirectionalValues& accel)
 
 void SensorFusion::PrintGravityVector(DirectionalValues& gravity)
 {
-    Serial.print("Gravity Vector in g's (x, y, z):  ");
+    Serial.print("Gravity Vector in m/s/s (x, y, z):  ");
     Serial.print(gravity.x);
     Serial.print(", ");
     Serial.print(gravity.y);

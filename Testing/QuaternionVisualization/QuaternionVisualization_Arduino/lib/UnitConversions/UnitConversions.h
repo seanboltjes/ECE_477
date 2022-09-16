@@ -13,6 +13,8 @@ public:
     static float FeetToMeters(float feet);
     static float RadiansToDegrees(float radians);
     static float DegreesToRadians(float degrees);
+    static float MetersPerSecondSquaredToGs(float metersPerSecondSquared);
+    static float GsToMetersPerSecondSquared(float gs);
 
 private:
 

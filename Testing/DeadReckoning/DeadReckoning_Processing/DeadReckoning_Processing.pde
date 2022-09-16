@@ -154,7 +154,7 @@ void serialEvent (Serial myPort) {
     if (items.length > 1) {
       //--- Position Values
       x = float(items[0]);
-      y = float(items[1]);
+      y = -1 * float(items[1]);
       z = float(items[2]);
     }
     else if (items.length == 1){
