@@ -78,3 +78,29 @@ float UnitConversions::DegreesToRadians(float degrees)
 {
     return degrees * DEFINED_PI / 180;
 }
+
+
+/**
+ * @brief Converts meters per second squared (m/s/s) to gravity g's
+ * 
+ * @param metersPerSecondSquared
+ * 
+ * @return float converted to g's
+ */
+float UnitConversions::MetersPerSecondSquaredToGs(float metersPerSecondSquared)
+{
+    return (metersPerSecondSquared * 0.101971621);
+}
+
+
+/**
+ * @brief Converts gravity g's to meters per second squared (m/s/s)
+ * 
+ * @param metersPerSecondSquared
+ * 
+ * @return float converted to meters per second squared (m/s/s)
+ */
+float UnitConversions::GsToMetersPerSecondSquared(float gs)
+{
+    return (gs * 9.8066500286);
+}

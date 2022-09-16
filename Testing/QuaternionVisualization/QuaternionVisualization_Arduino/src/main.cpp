@@ -9,6 +9,7 @@ void QuaternionCalculation();
 
 uint16_t count;
 uint32_t startTime;
+uint32_t startTimeCache;
 uint32_t lastUpdate = micros();
 
 
@@ -20,12 +21,8 @@ DataStructures::DirectionalValues accel;
 DataStructures::DirectionalValues gyro;
 DataStructures::DirectionalValues magnet;
 
-// The SensorFusion object. This wraps both the IMU and Magnetometer in one and performs data manipulation with them
-#ifdef RUN_QUATERNION_CALCULATION
-SensorFusion sensors(219);
-#else
-SensorFusion sensors(324);
-#endif
+
+SensorFusion sensors;
 
 
 /**
@@ -44,10 +41,11 @@ void setup()
 
     #ifndef RUN_QUATERNION_CALCULATION
     // Calibrate the sensors. This may take some time
-    sensors.Calibrate();
+    // sensors.Calibrate();
     #endif
 
-    // hello world
+    // Log the time when we started this measurement
+    startTime = micros();
 }
 
 
@@ -70,44 +68,66 @@ void loop()
  */
 void DeadReckoning()
 {
-    startTime = millis();
-    count = 0;
-    while (startTime + 1000 > millis())
-    {
-        // Log the time when we started this measurement
-        uint32_t measureBeginTime = micros();
+    // startTime = millis();
+    // count = 0;
 
-        // Get all the sensor readings and break out of loop if one fails
-        if (!sensors.GetMagnetometerVals(magnet))
-            break;
-        if (!sensors.GetAccelVals(accel))
-            break;
-        if (!sensors.GetGyroVals(gyro))
-            break;
-        
-        // Try and get the Quaternion
-        if (sensors.GetQuaternion(quaternion, accel, gyro, magnet))
-        {
-            // Get the gravity vector and correct the acceleration
-            sensors.GetGravityVector(grav, accel, gyro, magnet);
-            sensors.CorrectAccel(accel);
+    // while (startTime + 1000 > millis())
+    // {
+    //     if (sensors.GetGravityVector(grav))
+    //     {
+    //         // sensors.GetGravityVector(grav);
+    //         // sensors.GetGravityVector(grav);
+    //         // sensors.PrintGravityVector(grav);
+    //     }
+    //     else
+    //     {
+    //         Serial.println("Err");
+    //     }
 
-            // Log the time when we finished the measurement 
-            lastUpdate = micros();
-            sensors.UpdatePosition(accel, lastUpdate - measureBeginTime);
-            
-            // Print out our current position estimate
-            sensors.PrintCurrentPosition();
-            
-            // Print out all detailed values related to Dead Reckoning
-            // sensors.PrintDetailedDeadReckoning(accel);
-        }
+    //     if (sensors.GetLinearAccelVals(grav))
+    //     {
+    //         // sensors.GetGravityVector(grav);
+    //         // sensors.GetGravityVector(grav);
+    //         // sensors.PrintReadingsAccel(grav);
+    //     }
+    //     else
+    //     {
+    //         Serial.println("Err");
+    //     }
 
-        count++;
-    }
+    //     if (sensors.GetQuaternion(quaternion))
+    //     {
+    //         // sensors.GetGravityVector(grav);
+    //         // sensors.GetGravityVector(grav);
+    //         // sensors.PrintQuaternion(quaternion);
+    //     }
+    //     else
+    //     {
+    //         Serial.println("Err");
+    //     }
+    //     count++;
+    // }
+
+    // Serial.println(count);
+
+    // return;
+
+
+
     
-    // print how many readings we got in 1 second. Feed this in constructor of filter
-    Serial.println(count);
+    // Try and get acceleration
+    while (!sensors.GetLinearAccelVals(accel));
+
+    // Log the time when we finished the measurement 
+    lastUpdate = micros();
+    startTimeCache = lastUpdate;
+    
+    sensors.UpdatePosition(accel, lastUpdate - startTime);
+
+    startTime = startTimeCache;
+    
+    // Print out our current position estimate
+    sensors.PrintCurrentPosition();
 }
 
 
@@ -120,17 +140,9 @@ void QuaternionCalculation()
     count = 0;
     while (startTime + 1000 > millis())
     {
-        // Get all the sensor readings and break out of loop if one fails
-        if (!sensors.GetMagnetometerVals(magnet))
-            break;
-        if (!sensors.GetAccelVals(accel))
-            break;
-        if (!sensors.GetGyroVals(gyro))
-            break;
+        sensors.GetQuaternion(quaternion);
 
-        sensors.GetQuaternion(quaternion, accel, gyro, magnet);
-
-        SensorFusion::PrintQuaternion(quaternion);
+        sensors.PrintQuaternion(quaternion);
         delay(2);
         count++;
     }
