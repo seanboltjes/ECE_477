@@ -9,7 +9,7 @@ void IMU_BNO085::InitIMU()
 {
     Wire.setClock(400000);
     Wire.begin();
-    imu = new Adafruit_BNO08x(12);
+    imu = new Adafruit_BNO08x();
 
     while (!imu->begin_I2C())
     {
@@ -25,20 +25,6 @@ void IMU_BNO085::InitIMU()
 
 
     Serial.println("IMU Init Success");
-
-
-    for (int n = 0; n < imu->prodIds.numEntries; n++) {
-        Serial.print("Part ");
-        Serial.print(imu->prodIds.entry[n].swPartNumber);
-        Serial.print(": Version :");
-        Serial.print(imu->prodIds.entry[n].swVersionMajor);
-        Serial.print(".");
-        Serial.print(imu->prodIds.entry[n].swVersionMinor);
-        Serial.print(".");
-        Serial.print(imu->prodIds.entry[n].swVersionPatch);
-        Serial.print(" Build ");
-        Serial.println(imu->prodIds.entry[n].swBuildNumber);
-    }
 }
 
 

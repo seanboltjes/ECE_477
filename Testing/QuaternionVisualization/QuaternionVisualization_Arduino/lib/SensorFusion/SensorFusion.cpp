@@ -124,9 +124,10 @@ void SensorFusion::CorrectAccel(DirectionalValues& accel)
  * @brief Updates the current position estimate using Dead Reckoning
  * 
  * @param correctedAccel the acceleration after it has been corrected from gravity
+ * @param gravity the gravity vector
  * @param timeSinceLastUpdate_us the time in microseconds since this method was last called.
  */
-void SensorFusion::UpdatePosition(DirectionalValues& correctedAccel, uint32_t timeSinceLastUpdate_us)
+void SensorFusion::UpdatePosition(DirectionalValues& correctedAccel, DirectionalValues& gravity, uint32_t timeSinceLastUpdate_us)
 {
     double accelTermX, accelTermY, accelTermZ;
 
@@ -287,6 +288,111 @@ bool SensorFusion::GetEulerRotation(EulerRotations& eulerRotations, Quaternion& 
     return true;
 }
 
+
+void SensorFusion::ConvertLocalToGlobalCoords(DirectionalValues& uncorrectedAccel, DirectionalValues& correctedAccel, BLA::Matrix<4, 4>& rotationMatrix)
+{
+    bool didWork = Invert(rotationMatrix);
+
+    BLA::Matrix<4, 1> accelerationMatrix = {uncorrectedAccel.x, uncorrectedAccel.y, uncorrectedAccel.z, 0};
+
+    BLA::Matrix<4, 1> accelReferenced = rotationMatrix * accelerationMatrix;
+
+    correctedAccel.x = accelReferenced(0);
+    correctedAccel.y = accelReferenced(1);
+    correctedAccel.z = accelReferenced(2);
+
+    if (!didWork)
+    {
+        Serial.println("OH NOES!!");
+    }
+}
+
+
+void SensorFusion::ConvertLocalToGlobalCoords(DirectionalValues& uncorrectedAccel, DirectionalValues& correctedAccel, EulerRotations& euler)
+{
+    correctedAccel.x =(float) (uncorrectedAccel.x*(cos(euler.roll)*cos(euler.yaw)+sin(euler.roll)*sin(euler.pitch)*sin(euler.yaw)) + uncorrectedAccel.y*(cos(euler.pitch)*sin(euler.yaw)) + uncorrectedAccel.z*(-sin(euler.roll)*cos(euler.yaw)+cos(euler.roll)*sin(euler.pitch)*sin(euler.yaw)));
+    correctedAccel.y = (float) (uncorrectedAccel.x*(-cos(euler.roll)*sin(euler.yaw)+sin(euler.roll)*sin(euler.pitch)*cos(euler.yaw)) + uncorrectedAccel.y*(cos(euler.pitch)*cos(euler.yaw)) + uncorrectedAccel.z*(sin(euler.roll)*sin(euler.yaw)+ cos(euler.roll)*sin(euler.pitch)*cos(euler.yaw)));
+    correctedAccel.z = (float) (uncorrectedAccel.x*(sin(euler.roll)*cos(euler.pitch)) + uncorrectedAccel.y*(-sin(euler.pitch)) + uncorrectedAccel.z*(cos(euler.roll)*cos(euler.pitch)));
+}
+
+void SensorFusion::ConvertQuaternionToEulerAngles(Quaternion& quaternion, EulerRotations& euler)
+{
+    float w = quaternion.real;
+    float x = quaternion.i;
+    float y = quaternion.j;
+    float z = quaternion.k;
+
+
+
+    euler.yaw   = UnitConversions::RadiansToDegrees(atan2(2.0f * (x * y + w * z), w * w + x * x - y * y - z * z));
+    euler.pitch = UnitConversions::RadiansToDegrees(-asin(2.0f * (x * z - w * y)));
+    euler.roll = UnitConversions::RadiansToDegrees(atan2(2.0f * (w * x + y * z), w * w - x * x - y * y + z * z));
+}
+
+void SensorFusion::ConvertQuaternionToRotationMatrix(Quaternion& quaternion, BLA::Matrix<4, 4>& rotationMatrix)
+{
+    float x_squared = pow(quaternion.i, 2);
+    float y_squared = pow(quaternion.j, 2);
+    float z_squared = pow(quaternion.k, 2);
+
+    float xy2 = 2 * quaternion.i * quaternion.j;
+    float xz2 = 2 * quaternion.i * quaternion.k;
+    float yz2 = 2 * quaternion.j * quaternion.k;
+
+    float sx2 = 2 * quaternion.i * quaternion.real;
+    float sy2 = 2 * quaternion.j * quaternion.real;
+    float sz2 = 2 * quaternion.k * quaternion.real;
+
+    rotationMatrix(0, 0) = 1 - (2 * y_squared) - (2 * z_squared);
+    rotationMatrix(0, 1) = xy2 - sz2;
+    rotationMatrix(0, 2) = xz2 + sy2;
+    rotationMatrix(0, 3) = 0;
+
+    
+
+    rotationMatrix(1, 0) = xy2 + sz2;
+    rotationMatrix(1, 1) = 1 - (2 * x_squared) - (2 * z_squared);
+    rotationMatrix(1, 2) = yz2 - sx2;
+    rotationMatrix(1, 3) = 0;
+
+
+    rotationMatrix(2, 0) = xz2 - sy2;
+    rotationMatrix(2, 1) = yz2 + sx2;
+    rotationMatrix(2, 2) = 1 - (2 * x_squared) - (2 * y_squared);
+    rotationMatrix(2, 3) = 0;
+
+
+    rotationMatrix(3, 0) = 0;
+    rotationMatrix(3, 1) = 0;
+    rotationMatrix(3, 2) = 0;
+    rotationMatrix(3, 3) = 1;
+
+
+
+
+    // rotationMatrix.row1[0] = 1 - (2 * y_squared) - (2 * z_squared);
+    // rotationMatrix.row1[1] = xy2 - sz2;
+    // rotationMatrix.row1[2] = xz2 + sy2;
+    // rotationMatrix.row1[3] = 0;
+
+
+    // rotationMatrix.row2[0] = xy2 + sz2;
+    // rotationMatrix.row2[1] = 1 - (2 * x_squared) - (2 * z_squared);
+    // rotationMatrix.row2[2] = yz2 - sx2;
+    // rotationMatrix.row2[3] = 0;
+
+
+    // rotationMatrix.row3[0] = xz2 - sy2;
+    // rotationMatrix.row3[1] = yz2 - sx2;
+    // rotationMatrix.row3[2] = 1 - (2 * x_squared) - (2 * y_squared);
+    // rotationMatrix.row3[3] = 0;
+
+
+    // rotationMatrix.row4[0] = 0;
+    // rotationMatrix.row4[1] = 0;
+    // rotationMatrix.row4[2] = 0;
+    // rotationMatrix.row4[3] = 1;
+}
 
 void SensorFusion::GetAndPrintAllReadings()
 {
