@@ -310,7 +310,7 @@ void SensorFusion::ConvertLocalToGlobalCoords(DirectionalValues& uncorrectedAcce
 
 void SensorFusion::ConvertLocalToGlobalCoords(DirectionalValues& uncorrectedAccel, DirectionalValues& correctedAccel, EulerRotations& euler)
 {
-    correctedAccel.x =(float) (uncorrectedAccel.x*(cos(euler.roll)*cos(euler.yaw)+sin(euler.roll)*sin(euler.pitch)*sin(euler.yaw)) + uncorrectedAccel.y*(cos(euler.pitch)*sin(euler.yaw)) + uncorrectedAccel.z*(-sin(euler.roll)*cos(euler.yaw)+cos(euler.roll)*sin(euler.pitch)*sin(euler.yaw)));
+    correctedAccel.x = (float) (uncorrectedAccel.x*(cos(euler.roll)*cos(euler.yaw)+sin(euler.roll)*sin(euler.pitch)*sin(euler.yaw)) + uncorrectedAccel.y*(cos(euler.pitch)*sin(euler.yaw)) + uncorrectedAccel.z*(-sin(euler.roll)*cos(euler.yaw)+cos(euler.roll)*sin(euler.pitch)*sin(euler.yaw)));
     correctedAccel.y = (float) (uncorrectedAccel.x*(-cos(euler.roll)*sin(euler.yaw)+sin(euler.roll)*sin(euler.pitch)*cos(euler.yaw)) + uncorrectedAccel.y*(cos(euler.pitch)*cos(euler.yaw)) + uncorrectedAccel.z*(sin(euler.roll)*sin(euler.yaw)+ cos(euler.roll)*sin(euler.pitch)*cos(euler.yaw)));
     correctedAccel.z = (float) (uncorrectedAccel.x*(sin(euler.roll)*cos(euler.pitch)) + uncorrectedAccel.y*(-sin(euler.pitch)) + uncorrectedAccel.z*(cos(euler.roll)*cos(euler.pitch)));
 }
@@ -344,13 +344,13 @@ void SensorFusion::ConvertQuaternionToRotationMatrix(Quaternion& quaternion, BLA
     float sz2 = 2 * quaternion.k * quaternion.real;
 
     rotationMatrix(0, 0) = 1 - (2 * y_squared) - (2 * z_squared);
-    rotationMatrix(0, 1) = xy2 - sz2;
+    rotationMatrix(0, 1) = -1 * (xy2 - sz2);
     rotationMatrix(0, 2) = xz2 + sy2;
     rotationMatrix(0, 3) = 0;
 
     
 
-    rotationMatrix(1, 0) = xy2 + sz2;
+    rotationMatrix(1, 0) = -1 * (xy2 + sz2);
     rotationMatrix(1, 1) = 1 - (2 * x_squared) - (2 * z_squared);
     rotationMatrix(1, 2) = yz2 - sx2;
     rotationMatrix(1, 3) = 0;
