@@ -124,10 +124,9 @@ void SensorFusion::CorrectAccel(DirectionalValues& accel)
  * @brief Updates the current position estimate using Dead Reckoning
  * 
  * @param correctedAccel the acceleration after it has been corrected from gravity
- * @param gravity the gravity vector
  * @param timeSinceLastUpdate_us the time in microseconds since this method was last called.
  */
-void SensorFusion::UpdatePosition(DirectionalValues& correctedAccel, DirectionalValues& gravity, uint32_t timeSinceLastUpdate_us)
+void SensorFusion::UpdatePosition(DirectionalValues& correctedAccel, uint32_t timeSinceLastUpdate_us)
 {
     double accelTermX, accelTermY, accelTermZ;
 

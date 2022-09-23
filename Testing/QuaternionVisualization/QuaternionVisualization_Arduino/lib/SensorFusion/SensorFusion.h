@@ -29,7 +29,7 @@ public:
     // Position Methods
     // virtual bool GetGravityVector(DirectionalValues& gravityVector, Quaternion& quaternion);
     virtual void CorrectAccel(DirectionalValues& accel);
-    virtual void UpdatePosition(DirectionalValues& correctedAccel, DirectionalValues& gravity, uint32_t timeSinceLastUpdate_us);
+    virtual void UpdatePosition(DirectionalValues& correctedAccel, uint32_t timeSinceLastUpdate_us);
 
     // Print Methods
     static void PrintGravityVector(DirectionalValues& gravity);
