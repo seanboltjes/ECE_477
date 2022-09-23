@@ -137,7 +137,7 @@ void DeadReckoning()
 
     // Serial.println(globalAccel.x);
     
-    sensors.UpdatePosition(globalAccel, grav, lastUpdate - startTime);
+    sensors.UpdatePosition(globalAccel, lastUpdate - startTime);
 
     startTime = startTimeCache;
     
