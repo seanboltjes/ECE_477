@@ -21,6 +21,10 @@ public:
     // Quaternion Methods (Absolute Orientation)
     virtual bool GetEulerRotation(EulerRotations& eulerRotations, Quaternion& quaternion);
     virtual bool GetEulerRotation(EulerRotations& eulerRotations, DirectionalValues& accel, DirectionalValues& gyro, DirectionalValues& magnet);
+    virtual void ConvertQuaternionToRotationMatrix(Quaternion& quaternion, BLA::Matrix<4, 4>& rotationMatrix);
+    virtual void ConvertQuaternionToEulerAngles(Quaternion& quaternion, EulerRotations& euler);
+    virtual void ConvertLocalToGlobalCoords(DirectionalValues& uncorrectedAccel, DirectionalValues& correctedAceel, BLA::Matrix<4, 4>& rotationMatrix);
+    virtual void ConvertLocalToGlobalCoords(DirectionalValues& uncorrectedAccel, DirectionalValues& correctedAccel, EulerRotations& euler);
 
     // Position Methods
     // virtual bool GetGravityVector(DirectionalValues& gravityVector, Quaternion& quaternion);

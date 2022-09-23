@@ -2,7 +2,7 @@
 #include "SensorFusion.h"
 
 // comment this out to do dead reckoning, leave it uncommented to calculate quaternions
-#define RUN_QUATERNION_CALCULATION
+// #define RUN_QUATERNION_CALCULATION
 
 void DeadReckoning();
 void QuaternionCalculation();
@@ -18,9 +18,11 @@ DataStructures::Quaternion quaternion;
 DataStructures::EulerRotations euler;
 DataStructures::DirectionalValues grav;
 DataStructures::DirectionalValues accel;
+DataStructures::DirectionalValues globalAccel;
 DataStructures::DirectionalValues gyro;
 DataStructures::DirectionalValues magnet;
 
+BLA::Matrix<4, 4> rotationMatrix;
 
 SensorFusion sensors;
 
@@ -115,14 +117,27 @@ void DeadReckoning()
 
 
     
-    // Try and get acceleration
+    // Try and get acceleration, gravity, and quaternion
     while (!sensors.GetLinearAccelVals(accel));
+    while (!sensors.GetGravityVector(grav));
+    while (!sensors.GetQuaternion(quaternion));
+
+
+    sensors.ConvertQuaternionToRotationMatrix(quaternion, rotationMatrix);
+    sensors.ConvertLocalToGlobalCoords(accel, globalAccel, rotationMatrix);
+
+    // sensors.ConvertQuaternionToEulerAngles(quaternion, euler);
+    // sensors.ConvertLocalToGlobalCoords(accel, globalAccel, euler);
 
     // Log the time when we finished the measurement 
     lastUpdate = micros();
     startTimeCache = lastUpdate;
+
+    // sensors.PrintReadingsAccel(globalAccel);
+
+    // Serial.println(globalAccel.x);
     
-    sensors.UpdatePosition(accel, lastUpdate - startTime);
+    sensors.UpdatePosition(globalAccel, grav, lastUpdate - startTime);
 
     startTime = startTimeCache;
     
