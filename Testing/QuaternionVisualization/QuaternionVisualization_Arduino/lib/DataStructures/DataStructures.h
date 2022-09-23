@@ -1,7 +1,9 @@
 #ifndef DS_H
 #define DS_H
 #include <math.h>
+#include <BasicLinearAlgebra.h>
 
+using namespace BLA;
 
 class DataStructures
 {    
@@ -41,6 +43,14 @@ public:
         float roll;
         float pitch;
         float yaw;
+    };
+
+    struct RotationMatrix
+    {
+        float row1[4];
+        float row2[4];
+        float row3[4];
+        float row4[4];
     };
 
 };
