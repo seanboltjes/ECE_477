@@ -1,0 +1,5 @@
+(fp_lib_table
+  (lib (name "BNO080")(type "KiCad")(uri "${KIPRJMOD}/libs/BNO080")(options "")(descr ""))
+  (lib (name "TP4056")(type "KiCad")(uri "${KIPRJMOD}/libs/TP4056")(options "")(descr ""))
+  (lib (name "ESP32-PICO-MINI-02")(type "KiCad")(uri "${KIPRJMOD}/libs/ESP32-PICO-MINI-02")(options "")(descr ""))
+)

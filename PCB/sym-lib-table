@@ -1,4 +1,5 @@
 (sym_lib_table
   (lib (name "TP4056")(type "Legacy")(uri "${KIPRJMOD}/libs/TP4056/TP4056.lib")(options "")(descr ""))
   (lib (name "BNO080")(type "Legacy")(uri "${KIPRJMOD}/libs/BNO080/BNO080.lib")(options "")(descr ""))
+  (lib (name "ESP32-PICO-MINI-02")(type "Legacy")(uri "${KIPRJMOD}/libs/ESP32-PICO-MINI-02/ESP32-PICO-MINI-02.lib")(options "")(descr ""))
 )
