@@ -4759,7 +4759,7 @@
     (in_bom yes) (on_board yes)
     (uuid 6af530fe-2856-4bc5-8bfb-18ae820ea753)
     (property "Reference" "R14" (id 0) (at 363.855 128.905 90))
-    (property "Value" "R" (id 1) (at 363.855 131.445 90))
+    (property "Value" "270" (id 1) (at 363.855 131.445 90))
     (property "Footprint" "" (id 2) (at 363.855 132.207 90)
       (effects (font (size 1.27 1.27)) hide)
     )
@@ -6132,7 +6132,7 @@
       (reference "R13") (unit 1) (value "10") (footprint "")
     )
     (path "/6af530fe-2856-4bc5-8bfb-18ae820ea753"
-      (reference "R14") (unit 1) (value "R") (footprint "")
+      (reference "R14") (unit 1) (value "270") (footprint "")
     )
     (path "/72cfc5c7-1fac-430a-a194-de4311a0938b"
       (reference "R15") (unit 1) (value "3.3k") (footprint "")
