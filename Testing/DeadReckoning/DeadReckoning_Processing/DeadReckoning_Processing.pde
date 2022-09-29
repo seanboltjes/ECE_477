@@ -2,11 +2,11 @@ import processing.serial.*;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.util.*;
-import oscP5.*;
-import netP5.*;
+//import oscP5.*;
+//import netP5.*;
 
-OscP5 oscP5;
-NetAddress myBroadcastLocation;
+//OscP5 oscP5;
+//NetAddress myBroadcastLocation;
 
 Serial myPort;
 
@@ -26,11 +26,11 @@ float qw, qx, qy, qz;
 List<Point> points = new ArrayList<Point>();
 
 void setup() {
-  myPort = new Serial(this, "COM6", 115200); // starts the serial communication
+  myPort = new Serial(this, "COM3", 115200); // starts the serial communication
   myPort.bufferUntil('\n');
   
-  oscP5 = new OscP5(this,12000);
-  myBroadcastLocation = new NetAddress("127.0.0.1",12000);
+  //oscP5 = new OscP5(this,12000);
+  //myBroadcastLocation = new NetAddress("127.0.0.1",12000);
   
   size(1200, 800, P3D);
   fill(204);
@@ -60,7 +60,7 @@ void draw()
   }
   
   DrawAllPoints();
-  DrawOrientation();
+  //DrawOrientation();
 }
 
 void DrawAllPoints()
@@ -185,16 +185,16 @@ void serialEvent (Serial myPort) {
 
 
 
-void DrawOrientation()
-{
-    //String stringy = str(qw) + "/" + str(qx) + "/" + str(qy) + "/" + str(qz);
-    //saveStrings("../orientation.txt", str(stringy));
+//void DrawOrientation()
+//{
+//    //String stringy = str(qw) + "/" + str(qx) + "/" + str(qy) + "/" + str(qz);
+//    //saveStrings("../orientation.txt", str(stringy));
     
-    OscMessage myMessage = new OscMessage("HI");
+//    OscMessage myMessage = new OscMessage("HI");
  
-    /* send the message */
-    oscP5.send(myMessage, myBroadcastLocation); 
-}
+//    /* send the message */
+//    oscP5.send(myMessage, myBroadcastLocation); 
+//}
 
 
 
