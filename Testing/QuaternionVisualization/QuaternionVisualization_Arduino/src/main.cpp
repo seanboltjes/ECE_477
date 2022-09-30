@@ -2,7 +2,7 @@
 #include "SensorFusion.h"
 
 // comment this out to do dead reckoning, leave it uncommented to calculate quaternions
-// #define RUN_QUATERNION_CALCULATION
+#define RUN_QUATERNION_CALCULATION
 
 void DeadReckoning();
 void QuaternionCalculation();

@@ -2,4 +2,7 @@
   (lib (name "BNO080")(type "KiCad")(uri "${KIPRJMOD}/libs/BNO080")(options "")(descr ""))
   (lib (name "TP4056")(type "KiCad")(uri "${KIPRJMOD}/libs/TP4056")(options "")(descr ""))
   (lib (name "ESP32")(type "KiCad")(uri "${KIPRJMOD}/libs/ESP32")(options "")(descr ""))
+  (lib (name "OnOffSwitch")(type "KiCad")(uri "${KIPRJMOD}/libs/OnOffSwitch")(options "")(descr ""))
+  (lib (name "footprints")(type "KiCad")(uri "${KIPRJMOD}/libs/OnOffSwitch/footprints.pretty")(options "")(descr ""))
+  (lib (name "0ZCJ0050FF2G")(type "KiCad")(uri "${KIPRJMOD}/libs/0ZCJ0050FF2G")(options "")(descr ""))
 )
