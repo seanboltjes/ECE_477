@@ -1608,52 +1608,6 @@
         )
       )
     )
-    (symbol "SensorHub-rescue:+3.3V-power" (power) (pin_names (offset 0)) (in_bom yes) (on_board yes)
-      (property "Reference" "#PWR" (id 0) (at 0 -3.81 0)
-        (effects (font (size 1.27 1.27)) hide)
-      )
-      (property "Value" "+3.3V-power" (id 1) (at 0 3.556 0)
-        (effects (font (size 1.27 1.27)))
-      )
-      (property "Footprint" "" (id 2) (at 0 0 0)
-        (effects (font (size 1.27 1.27)) hide)
-      )
-      (property "Datasheet" "" (id 3) (at 0 0 0)
-        (effects (font (size 1.27 1.27)) hide)
-      )
-      (symbol "+3.3V-power_0_1"
-        (polyline
-          (pts
-            (xy -0.762 1.27)
-            (xy 0 2.54)
-          )
-          (stroke (width 0) (type default) (color 0 0 0 0))
-          (fill (type none))
-        )
-        (polyline
-          (pts
-            (xy 0 0)
-            (xy 0 2.54)
-          )
-          (stroke (width 0) (type default) (color 0 0 0 0))
-          (fill (type none))
-        )
-        (polyline
-          (pts
-            (xy 0 2.54)
-            (xy 0.762 1.27)
-          )
-          (stroke (width 0) (type default) (color 0 0 0 0))
-          (fill (type none))
-        )
-      )
-      (symbol "+3.3V-power_1_1"
-        (pin power_in line (at 0 0 90) (length 0) hide
-          (name "+3V3" (effects (font (size 1.27 1.27))))
-          (number "1" (effects (font (size 1.27 1.27))))
-        )
-      )
-    )
     (symbol "Switch:SW_Push" (pin_numbers hide) (pin_names (offset 1.016) hide) (in_bom yes) (on_board yes)
       (property "Reference" "SW" (id 0) (at 1.27 2.54 0)
         (effects (font (size 1.27 1.27)) (justify left))
@@ -6458,22 +6412,6 @@
     (pin "1" (uuid f0b00095-0bbd-4fb6-bd35-5b147a1cc432))
   )
 
-  (symbol (lib_id "SensorHub-rescue:+3.3V-power") (at 160.655 88.9 0) (unit 1)
-    (in_bom yes) (on_board yes)
-    (uuid dc390b06-3d85-48f5-8b88-82d4a9fab27a)
-    (property "Reference" "#PWR0126" (id 0) (at 160.655 92.71 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property "Value" "+3.3V" (id 1) (at 161.036 84.5058 0))
-    (property "Footprint" "" (id 2) (at 160.655 88.9 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property "Datasheet" "" (id 3) (at 160.655 88.9 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (pin "1" (uuid 3c79fece-6dc2-4d20-a364-247f7e161a23))
-  )
-
   (symbol (lib_id "power:GND") (at 321.945 63.5 0) (unit 1)
     (in_bom yes) (on_board yes) (fields_autoplaced)
     (uuid de8dda42-61fe-4438-9b7b-21ce85ff7498)
@@ -6490,6 +6428,22 @@
       (effects (font (size 1.27 1.27)) hide)
     )
     (pin "1" (uuid 2a4e9830-82eb-4cba-96c5-bdb5ba262129))
+  )
+
+  (symbol (lib_id "power:+3.3V") (at 160.655 88.9 0) (unit 1)
+    (in_bom yes) (on_board yes) (fields_autoplaced)
+    (uuid e1c7bbb6-c4e5-4fbc-bea3-01564a483098)
+    (property "Reference" "#PWR?" (id 0) (at 160.655 92.71 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (property "Value" "+3.3V" (id 1) (at 160.655 85.3242 0))
+    (property "Footprint" "" (id 2) (at 160.655 88.9 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (property "Datasheet" "" (id 3) (at 160.655 88.9 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (pin "1" (uuid 742fbe7e-65ec-4bab-852a-a391c1884bcc))
   )
 
   (symbol (lib_id "Device:C_Small") (at 37.465 73.025 0) (unit 1)
@@ -6977,9 +6931,6 @@
     (path "/5f5cf714-cd35-435e-8561-ba99a014d09b"
       (reference "#PWR0125") (unit 1) (value "+3.3V") (footprint "")
     )
-    (path "/dc390b06-3d85-48f5-8b88-82d4a9fab27a"
-      (reference "#PWR0126") (unit 1) (value "+3.3V") (footprint "")
-    )
     (path "/985791ab-7b47-4686-a34c-4cb8f752c406"
       (reference "#PWR0127") (unit 1) (value "+BATT") (footprint "")
     )
@@ -7003,6 +6954,9 @@
     )
     (path "/61dc8898-6331-40cd-9892-a77ef87d746f"
       (reference "#PWR0134") (unit 1) (value "GND") (footprint "")
+    )
+    (path "/e1c7bbb6-c4e5-4fbc-bea3-01564a483098"
+      (reference "#PWR?") (unit 1) (value "+3.3V") (footprint "")
     )
     (path "/52cf2d49-7911-4779-ac42-2bcd30f30395"
       (reference "C1") (unit 1) (value "10uF") (footprint "Capacitor_SMD:C_0603_1608Metric")
