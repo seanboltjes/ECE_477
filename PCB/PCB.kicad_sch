@@ -4400,7 +4400,7 @@
   (symbol (lib_id "Device:L") (at 346.71 123.19 180) (unit 1)
     (in_bom yes) (on_board yes) (fields_autoplaced)
     (uuid 137f11c4-78d1-4fff-8656-cdf9ace6a70d)
-    (property "Reference" "L?" (id 0) (at 347.98 121.9199 0)
+    (property "Reference" "L1" (id 0) (at 347.98 121.9199 0)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Value" "1.5uH" (id 1) (at 347.98 124.4599 0)
@@ -4667,7 +4667,7 @@
   (symbol (lib_id "Device:C_Small") (at 317.5 124.46 0) (unit 1)
     (in_bom yes) (on_board yes) (fields_autoplaced)
     (uuid 2f577222-5557-4d7c-8ec5-b87cc49ea57a)
-    (property "Reference" "C?" (id 0) (at 320.04 123.1962 0)
+    (property "Reference" "C12" (id 0) (at 320.04 123.1962 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "10uF" (id 1) (at 320.04 125.7362 0)
@@ -5300,7 +5300,7 @@
   (symbol (lib_id "power:GND") (at 317.5 207.01 0) (unit 1)
     (in_bom yes) (on_board yes) (fields_autoplaced)
     (uuid 61dc8898-6331-40cd-9892-a77ef87d746f)
-    (property "Reference" "#PWR?" (id 0) (at 317.5 213.36 0)
+    (property "Reference" "#PWR0134" (id 0) (at 317.5 213.36 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (id 1) (at 317.5 212.09 0))
@@ -5854,7 +5854,7 @@
   (symbol (lib_id "Device:C_Small") (at 335.28 123.19 0) (unit 1)
     (in_bom yes) (on_board yes) (fields_autoplaced)
     (uuid 909e61cf-1d36-4782-ab5c-b4ae7863a994)
-    (property "Reference" "C?" (id 0) (at 337.82 121.9262 0)
+    (property "Reference" "C13" (id 0) (at 337.82 121.9262 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "1.3nF" (id 1) (at 337.82 124.4662 0)
@@ -5873,7 +5873,7 @@
   (symbol (lib_id "TPS63051RMWR:TPS63051RMWR") (at 369.57 116.84 0) (unit 1)
     (in_bom yes) (on_board yes) (fields_autoplaced)
     (uuid 9126a3d7-5b27-45fa-8724-25d783baa18d)
-    (property "Reference" "U?" (id 0) (at 369.57 93.98 0))
+    (property "Reference" "U4" (id 0) (at 369.57 93.98 0))
     (property "Value" "TPS63051RMWR" (id 1) (at 369.57 96.52 0))
     (property "Footprint" "QFN50P250X250X100-12N" (id 2) (at 369.57 116.84 0)
       (effects (font (size 1.27 1.27)) (justify left bottom) hide)
@@ -7002,7 +7002,7 @@
       (reference "#PWR0133") (unit 1) (value "GND") (footprint "")
     )
     (path "/61dc8898-6331-40cd-9892-a77ef87d746f"
-      (reference "#PWR?") (unit 1) (value "GND") (footprint "")
+      (reference "#PWR0134") (unit 1) (value "GND") (footprint "")
     )
     (path "/52cf2d49-7911-4779-ac42-2bcd30f30395"
       (reference "C1") (unit 1) (value "10uF") (footprint "Capacitor_SMD:C_0603_1608Metric")
@@ -7037,6 +7037,12 @@
     (path "/0ffba483-3242-46f0-be69-4042ec9e56a1"
       (reference "C11") (unit 1) (value "100nF") (footprint "Capacitor_SMD:C_0603_1608Metric")
     )
+    (path "/2f577222-5557-4d7c-8ec5-b87cc49ea57a"
+      (reference "C12") (unit 1) (value "10uF") (footprint "")
+    )
+    (path "/909e61cf-1d36-4782-ab5c-b4ae7863a994"
+      (reference "C13") (unit 1) (value "1.3nF") (footprint "")
+    )
     (path "/5cf5aff0-dc8a-4f55-b7fe-2729fa1be8c6"
       (reference "C15") (unit 1) (value "22pf") (footprint "Capacitor_SMD:C_0603_1608Metric")
     )
@@ -7066,12 +7072,6 @@
     )
     (path "/a14c0814-0a0a-4519-8c8a-eddd5389d603"
       (reference "C25") (unit 1) (value "10uF") (footprint "Capacitor_SMD:C_0603_1608Metric")
-    )
-    (path "/2f577222-5557-4d7c-8ec5-b87cc49ea57a"
-      (reference "C?") (unit 1) (value "10uF") (footprint "")
-    )
-    (path "/909e61cf-1d36-4782-ab5c-b4ae7863a994"
-      (reference "C?") (unit 1) (value "1.3nF") (footprint "")
     )
     (path "/8de632ee-0d20-40ed-ae11-2bd51fcd40ad"
       (reference "D1") (unit 1) (value "PRTR5V0U2X") (footprint "Package_TO_SOT_SMD:SOT-143")
@@ -7104,7 +7104,7 @@
       (reference "J1") (unit 1) (value "USB_B_Micro") (footprint "Connector_USB:USB_Micro-B_Molex_47346-0001")
     )
     (path "/137f11c4-78d1-4fff-8656-cdf9ace6a70d"
-      (reference "L?") (unit 1) (value "1.5uH") (footprint "")
+      (reference "L1") (unit 1) (value "1.5uH") (footprint "")
     )
     (path "/cef27ab4-b73f-410e-8967-9f4b41c610a5"
       (reference "Q1") (unit 1) (value "PJA3428") (footprint "Package_TO_SOT_SMD:SC-82AA_Handsoldering")
@@ -7244,11 +7244,11 @@
     (path "/f7ca8439-ff4c-419d-8431-8306c9a765cd"
       (reference "U3") (unit 1) (value "TP4056") (footprint "TP4056:SOP127P600X175-9N")
     )
+    (path "/9126a3d7-5b27-45fa-8724-25d783baa18d"
+      (reference "U4") (unit 1) (value "TPS63051RMWR") (footprint "QFN50P250X250X100-12N")
+    )
     (path "/eacacdb2-ba7e-471f-9bac-6f3c29d249db"
       (reference "U5") (unit 1) (value "BNO080") (footprint "BNO080:IC_BNO080")
-    )
-    (path "/9126a3d7-5b27-45fa-8724-25d783baa18d"
-      (reference "U?") (unit 1) (value "TPS63051RMWR") (footprint "QFN50P250X250X100-12N")
     )
     (path "/9ed9a567-c84d-4e7e-8ebb-3f8a1d85b8a9"
       (reference "Y1") (unit 1) (value "32.768 kHz") (footprint "Crystal:Crystal_SMD_EuroQuartz_EQ161-2Pin_3.2x1.5mm")
