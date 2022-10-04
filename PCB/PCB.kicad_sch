@@ -5082,7 +5082,7 @@
     (uuid 54b1a856-06a2-4795-8f0d-fe5a8e16418b)
     (property "Reference" "U4" (id 0) (at 344.17 101.6 0))
     (property "Value" "TPS63070RNMR" (id 1) (at 344.17 104.14 0))
-    (property "Footprint" "VREG_TPS63070RNMR" (id 2) (at 344.17 121.92 0)
+    (property "Footprint" "TPS63070RNMR:VREG_TPS63070RNMR" (id 2) (at 344.17 121.92 0)
       (effects (font (size 1.27 1.27)) (justify left bottom) hide)
     )
     (property "Datasheet" "" (id 3) (at 344.17 121.92 0)
@@ -7423,7 +7423,7 @@
       (reference "U3") (unit 1) (value "TP4056") (footprint "TP4056:SOP127P600X175-9N")
     )
     (path "/54b1a856-06a2-4795-8f0d-fe5a8e16418b"
-      (reference "U4") (unit 1) (value "TPS63070RNMR") (footprint "VREG_TPS63070RNMR")
+      (reference "U4") (unit 1) (value "TPS63070RNMR") (footprint "TPS63070RNMR:VREG_TPS63070RNMR")
     )
     (path "/eacacdb2-ba7e-471f-9bac-6f3c29d249db"
       (reference "U5") (unit 1) (value "BNO080") (footprint "BNO080:IC_BNO080")
