@@ -1,4 +1,4 @@
-20399925248853322
+20396592582834314
 0ZCJ0050FF2G
 RESC3216X125N
 
@@ -53003,13 +53003,6 @@ Fuse Fuseholder TR5 Littelfuse/Wickmann No. 460 No560
 0
 2
 2
-GRM31CR60J476KE19L
-CAPC3216X180N
-
-
-0
-2
-2
 Heatsink
 Heatsink_35x26mm_1xFixation3mm_Fischer-SK486-35
 Heatsink, 35mm x 26mm, 1x Fixation 3mm, Fischer SK486-35
@@ -80485,13 +80478,6 @@ SOP127P600X175-9N
 0
 9
 9
-TPS63070RNMR
-VREG_TPS63070RNMR
-
-
-0
-13
-13
 TerminalBlock
 TerminalBlock_Altech_AK300-2_P5.00mm
 Altech AK300 terminal block, pitch 5.0mm, 45 degree angled, see http://www.mouser.com/ds/2/16/PCBMETRC-24178.pdf
