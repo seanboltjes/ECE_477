@@ -5,5 +5,5 @@
   (lib (name "OnOffSwitch")(type "KiCad")(uri "${KIPRJMOD}/libs/OnOffSwitch")(options "")(descr ""))
   (lib (name "footprints")(type "KiCad")(uri "${KIPRJMOD}/libs/OnOffSwitch/footprints.pretty")(options "")(descr ""))
   (lib (name "0ZCJ0050FF2G")(type "KiCad")(uri "${KIPRJMOD}/libs/0ZCJ0050FF2G")(options "")(descr ""))
-  (lib (name "PHR-2")(type "KiCad")(uri "${KIPRJMOD}/libs/PHR-2")(options "")(descr ""))
+  (lib (name "GRM31CR60J476KE19L")(type "KiCad")(uri "C:/Users/kbrap/Downloads/GRM31CR60J476KE19L")(options "")(descr ""))
 )
