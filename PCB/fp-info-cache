@@ -1,4 +1,4 @@
-20396594081448349
+20399925248853322
 0ZCJ0050FF2G
 RESC3216X125N
 
@@ -53003,6 +53003,13 @@ Fuse Fuseholder TR5 Littelfuse/Wickmann No. 460 No560
 0
 2
 2
+GRM31CR60J476KE19L
+CAPC3216X180N
+
+
+0
+2
+2
 Heatsink
 Heatsink_35x26mm_1xFixation3mm_Fischer-SK486-35
 Heatsink, 35mm x 26mm, 1x Fixation 3mm, Fischer SK486-35
@@ -86071,3 +86078,10 @@ CUS-12TB
 0
 7
 7
+inductor
+IHLP1212BZERR56M11
+
+
+0
+2
+2

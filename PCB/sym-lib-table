@@ -3,4 +3,5 @@
   (lib (name "BNO080")(type "Legacy")(uri "${KIPRJMOD}/libs/BNO080/BNO080.lib")(options "")(descr "")(disabled))
   (lib (name "TPS63051RMWR")(type "Legacy")(uri "C:/Users/kbrap/OneDrive/Documents/TPS63051RMWR/TPS63051RMWR.lib")(options "")(descr ""))
   (lib (name "GRM31CR60J476KE19L")(type "Legacy")(uri "C:/Users/kbrap/Downloads/GRM31CR60J476KE19L/GRM31CR60J476KE19L.lib")(options "")(descr ""))
+  (lib (name "2022-10-12_16-25-27")(type "Legacy")(uri "${KIPRJMOD}/libs/KiCAD/2022-10-12_16-25-27/2022-10-12_16-25-27.lib")(options "")(descr ""))
 )
