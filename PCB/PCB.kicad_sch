@@ -4508,7 +4508,7 @@
     (property "Reference" "C13" (id 0) (at 361.95 124.46 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
-    (property "Value" "100 nF" (id 1) (at 359.41 127 0)
+    (property "Value" "10uF" (id 1) (at 359.41 127 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Footprint" "Capacitor_SMD:C_0603_1608Metric" (id 2) (at 367.03 125.73 0)
@@ -6585,7 +6585,7 @@
     (property "Reference" "C27" (id 0) (at 359.41 118.11 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
-    (property "Value" "10uF" (id 1) (at 356.87 120.65 0)
+    (property "Value" "100nF" (id 1) (at 356.87 120.65 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Footprint" "Capacitor_SMD:C_0603_1608Metric" (id 2) (at 364.49 119.38 0)
@@ -6604,10 +6604,10 @@
     (property "Reference" "L1" (id 0) (at 312.42 126.9999 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
-    (property "Value" "L" (id 1) (at 312.42 129.5399 0)
+    (property "Value" "1uH" (id 1) (at 312.42 129.5399 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
-    (property "Footprint" "inductor:IHLP1212BZERR56M11" (id 2) (at 311.15 128.27 0)
+    (property "Footprint" "inductor:IHLP1212BZER1R0M11" (id 2) (at 311.15 128.27 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Datasheet" "~" (id 3) (at 311.15 128.27 0)
@@ -7673,7 +7673,7 @@
       (reference "C12") (unit 1) (value "47uF") (footprint "Capacitor_SMD:C_1206_3216Metric_Pad1.33x1.80mm_HandSolder")
     )
     (path "/1064231c-bfd3-489f-ae80-b5249537604d"
-      (reference "C13") (unit 1) (value "100 nF") (footprint "Capacitor_SMD:C_0603_1608Metric")
+      (reference "C13") (unit 1) (value "10uF") (footprint "Capacitor_SMD:C_0603_1608Metric")
     )
     (path "/1efd981a-b294-4f8f-8a3b-cd723ec3f3c5"
       (reference "C14") (unit 1) (value "10uF") (footprint "Capacitor_SMD:C_0603_1608Metric")
@@ -7715,7 +7715,7 @@
       (reference "C26") (unit 1) (value "10uF") (footprint "Capacitor_SMD:C_0603_1608Metric")
     )
     (path "/c2952636-7ad4-4c20-8de3-ed7e9fecf3f5"
-      (reference "C27") (unit 1) (value "10uF") (footprint "Capacitor_SMD:C_0603_1608Metric")
+      (reference "C27") (unit 1) (value "100nF") (footprint "Capacitor_SMD:C_0603_1608Metric")
     )
     (path "/d3bb0cec-8971-4b1a-a87c-b6e52ecd32b6"
       (reference "C28") (unit 1) (value "100nF") (footprint "Capacitor_SMD:C_0603_1608Metric")
@@ -7757,7 +7757,7 @@
       (reference "J2") (unit 1) (value "Conn_01x02") (footprint "PHR-2:JST_PHR-2")
     )
     (path "/c386aa6a-54a9-4a0e-9ad5-3e2e9aeae025"
-      (reference "L1") (unit 1) (value "L") (footprint "inductor:IHLP1212BZERR56M11")
+      (reference "L1") (unit 1) (value "1uH") (footprint "inductor:IHLP1212BZER1R0M11")
     )
     (path "/cef27ab4-b73f-410e-8967-9f4b41c610a5"
       (reference "Q1") (unit 1) (value "PJA3428") (footprint "Package_TO_SOT_SMD:SC-82AA_Handsoldering")
