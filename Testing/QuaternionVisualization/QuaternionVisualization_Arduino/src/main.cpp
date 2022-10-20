@@ -2,7 +2,7 @@
 #include "SensorFusion.h"
 
 // comment this out to do dead reckoning, leave it uncommented to calculate quaternions
-// #define RUN_QUATERNION_CALCULATION
+#define RUN_QUATERNION_CALCULATION
 
 void DeadReckoning();
 void QuaternionCalculation();
@@ -118,34 +118,31 @@ void DeadReckoning()
 
     
     // Try and get acceleration, gravity, and quaternion
-    // while (!sensors.GetLinearAccelVals(accel));
+    while (!sensors.GetLinearAccelVals(accel));
     while (!sensors.GetGravityVector(grav));
-    // while (!sensors.GetQuaternion(quaternion));
+    while (!sensors.GetQuaternion(quaternion));
 
 
-    sensors.PrintReadingsAccel(grav);
-
-
-    // sensors.ConvertQuaternionToRotationMatrix(quaternion, rotationMatrix);
-    // sensors.ConvertLocalToGlobalCoords(accel, globalAccel, rotationMatrix);
+    sensors.ConvertQuaternionToRotationMatrix(quaternion, rotationMatrix);
+    sensors.ConvertLocalToGlobalCoords(accel, globalAccel, rotationMatrix);
 
     // sensors.ConvertQuaternionToEulerAngles(quaternion, euler);
     // sensors.ConvertLocalToGlobalCoords(accel, globalAccel, euler);
 
     // Log the time when we finished the measurement 
-    // lastUpdate = micros();
-    // startTimeCache = lastUpdate;
+    lastUpdate = micros();
+    startTimeCache = lastUpdate;
 
     // sensors.PrintReadingsAccel(globalAccel);
 
     // Serial.println(globalAccel.x);
     
-    // sensors.UpdatePosition(globalAccel, lastUpdate - startTime);
+    sensors.UpdatePosition(globalAccel, lastUpdate - startTime);
 
-    // startTime = startTimeCache;
+    startTime = startTimeCache;
     
-    // // Print out our current position estimate
-    // sensors.PrintCurrentPosition();
+    // Print out our current position estimate
+    sensors.PrintCurrentPosition();
 }
 
 
